@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="vermouth.svg">assets/vermouth.svg</file>
+    </qresource>
+</RCC>
