@@ -41,15 +41,21 @@ int main(int argc, char *argv[]) {
 
     // Direct launch mode - no GUI
     if (parser.isSet(launchProtonOpt)) {
-        launcher.launchProton(parser.value(protonOpt),
-                              parser.value(prefixOpt),
-                              parser.value(launchProtonOpt));
+        QVariantMap entry;
+        entry["runtimeType"] = "proton";
+        entry["protonPath"] = parser.value(protonOpt);
+        entry["protonPrefix"] = parser.value(prefixOpt);
+        entry["exePath"] = parser.value(launchProtonOpt);
+        launcher.launchEntry(entry);
         return 0;
     }
     if (parser.isSet(launchWineOpt)) {
-        launcher.launchWine(parser.value(wineOpt),
-                            parser.value(prefixOpt),
-                            parser.value(launchWineOpt));
+        QVariantMap entry;
+        entry["runtimeType"] = "wine";
+        entry["wineBinary"] = parser.value(wineOpt);
+        entry["winePrefix"] = parser.value(prefixOpt);
+        entry["exePath"] = parser.value(launchWineOpt);
+        launcher.launchEntry(entry);
         return 0;
     }
 
