@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Gui Widgets QuickControls2)
 
 qt_add_executable(vermouth
@@ -35,6 +36,13 @@ target_link_libraries(vermouth PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::QuickControls2
+)
+
+target_compile_definitions(vermouth PRIVATE
+    APP_VERSION_STRING="${PROJECT_VERSION}"
+)
+target_compile_definitions(vermouth PRIVATE
+    APP_NAME_STRING="${PROJECT_NAME}"
 )
 
 install(TARGETS vermouth DESTINATION bin)

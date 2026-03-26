@@ -14,12 +14,10 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     if (QQuickStyle::name().isEmpty())
         QQuickStyle::setStyle("Fusion");
-    app.setApplicationName("vermouth");
-    app.setOrganizationName("vermouth");
-    app.setApplicationVersion("0.1.0");
+    app.setApplicationName(QString(APP_NAME_STRING));
+    app.setApplicationVersion(QString(APP_VERSION_STRING));
     app.setWindowIcon(QIcon(":/icons/vermouth.svg"));
 
-    // Handle CLI launch mode (from .desktop files)
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addVersionOption();
@@ -59,7 +57,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    // GUI mode
     AppModel appModel;
     ProtonScanner protonScanner;
     DesktopFileWriter desktopWriter;

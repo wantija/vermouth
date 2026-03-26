@@ -211,12 +211,18 @@ GridView {
             MenuItem {
                 text: "Remove"
                 icon.name: "edit-delete"
-                onTriggered: confirmDeleteAppDialog.payload = delegateRoot.index, confirmDeleteAppDialog.open()
+                onTriggered: {
+                    confirmDeleteAppDialog.payload = delegateRoot.index
+                    confirmDeleteAppDialog.open()
+                }
             }
             MenuItem {
                 text: "Remove and Delete Prefix"
                 icon.name: "edit-delete"
-                onTriggered: confirmDeleteDialog.payload = delegateRoot.index, confirmDeleteDialog.open()
+                onTriggered: {
+                    confirmDeleteDialog.payload = delegateRoot.index
+                    confirmDeleteDialog.open()
+                }
             }
         }
     }
