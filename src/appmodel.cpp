@@ -11,24 +11,50 @@ AppModel::AppModel(QObject *parent)
     load();
 }
 
+int AppModel::sourceIndex(int filteredIndex) const {
+    if (filteredIndex < 0 || filteredIndex >= m_filtered.size())
+        return -1;
+    return m_filtered[filteredIndex];
+}
+
+void AppModel::rebuildFilter() {
+    m_filtered.clear();
+    for (int i = 0; i < m_entries.size(); ++i) {
+        if (m_filter.isEmpty() ||
+            m_entries[i].name.contains(m_filter, Qt::CaseInsensitive))
+            m_filtered.append(i);
+    }
+}
+
+void AppModel::setFilterString(const QString &filter) {
+    if (m_filter == filter)
+        return;
+    beginResetModel();
+    m_filter = filter;
+    rebuildFilter();
+    endResetModel();
+    emit countChanged();
+}
+
 int AppModel::rowCount(const QModelIndex &) const {
-    return m_entries.size();
+    return m_filtered.size();
 }
 
 QVariant AppModel::data(const QModelIndex &index, int role) const {
-    if (index.row() < 0 || index.row() >= m_entries.size())
+    int src = sourceIndex(index.row());
+    if (src < 0)
         return {};
 
-    const auto &e = m_entries[index.row()];
+    const auto &e = m_entries[src];
     switch (role) {
-    case NameRole:         return e.name;
-    case ExePathRole:      return e.exePath;
-    case RuntimeTypeRole:  return (e.runtimeType == AppEntry::Proton) ? "proton" : "wine";
-    case ProtonPathRole:   return e.protonPath;
-    case ProtonPrefixRole: return e.protonPrefix;
-    case WineBinaryRole:   return e.wineBinary;
-    case WinePrefixRole:   return e.winePrefix;
-    case IconPathRole:     return e.iconPath;
+    case NameRole:          return e.name;
+    case ExePathRole:       return e.exePath;
+    case RuntimeTypeRole:   return (e.runtimeType == AppEntry::Proton) ? "proton" : "wine";
+    case ProtonPathRole:    return e.protonPath;
+    case ProtonPrefixRole:  return e.protonPrefix;
+    case WineBinaryRole:    return e.wineBinary;
+    case WinePrefixRole:    return e.winePrefix;
+    case IconPathRole:      return e.iconPath;
     case LaunchOptionsRole: return e.launchOptions;
     case EnableLoggingRole: return e.enableLogging;
     }
@@ -37,14 +63,14 @@ QVariant AppModel::data(const QModelIndex &index, int role) const {
 
 QHash<int, QByteArray> AppModel::roleNames() const {
     return {
-        {NameRole,         "name"},
-        {ExePathRole,      "exePath"},
-        {RuntimeTypeRole,  "runtimeType"},
-        {ProtonPathRole,   "protonPath"},
-        {ProtonPrefixRole, "protonPrefix"},
-        {WineBinaryRole,   "wineBinary"},
-        {WinePrefixRole,   "winePrefix"},
-        {IconPathRole,     "iconPath"},
+        {NameRole,          "name"},
+        {ExePathRole,       "exePath"},
+        {RuntimeTypeRole,   "runtimeType"},
+        {ProtonPathRole,    "protonPath"},
+        {ProtonPrefixRole,  "protonPrefix"},
+        {WineBinaryRole,    "wineBinary"},
+        {WinePrefixRole,    "winePrefix"},
+        {IconPathRole,      "iconPath"},
         {LaunchOptionsRole, "launchOptions"},
         {EnableLoggingRole, "enableLogging"},
     };
@@ -69,18 +95,22 @@ void AppModel::addApp(const QString &name, const QString &exePath,
     e.launchOptions = launchOptions;
     e.enableLogging = enableLogging;
 
-    beginInsertRows(QModelIndex(), m_entries.size(), m_entries.size());
+    beginResetModel();
     m_entries.append(e);
-    endInsertRows();
+    rebuildFilter();
+    endResetModel();
     emit countChanged();
     save();
 }
 
 void AppModel::removeApp(int index) {
-    if (index < 0 || index >= m_entries.size()) return;
-    beginRemoveRows(QModelIndex(), index, index);
-    m_entries.removeAt(index);
-    endRemoveRows();
+    int src = sourceIndex(index);
+    if (src < 0) return;
+
+    beginResetModel();
+    m_entries.removeAt(src);
+    rebuildFilter();
+    endResetModel();
     emit countChanged();
     save();
 }
@@ -93,8 +123,10 @@ void AppModel::editApp(int index,
                        const QString &iconPath,
                        const QString &launchOptions,
                        bool enableLogging) {
-    if (index < 0 || index >= m_entries.size()) return;
-    auto &e = m_entries[index];
+    int src = sourceIndex(index);
+    if (src < 0) return;
+
+    auto &e = m_entries[src];
     e.name = name;
     e.exePath = exePath;
     e.runtimeType = (runtimeType == "proton") ? AppEntry::Proton : AppEntry::Wine;
@@ -105,13 +137,20 @@ void AppModel::editApp(int index,
     e.iconPath = iconPath;
     e.launchOptions = launchOptions;
     e.enableLogging = enableLogging;
-    emit dataChanged(createIndex(index, 0), createIndex(index, 0));
+
+    // Name may have changed, so filter could change
+    beginResetModel();
+    rebuildFilter();
+    endResetModel();
+    emit countChanged();
     save();
 }
 
 QVariantMap AppModel::getApp(int index) const {
-    if (index < 0 || index >= m_entries.size()) return {};
-    const auto &e = m_entries[index];
+    int src = sourceIndex(index);
+    if (src < 0) return {};
+
+    const auto &e = m_entries[src];
     return {
         {"name", e.name},
         {"exePath", e.exePath},
@@ -142,6 +181,7 @@ void AppModel::load() {
     m_entries.clear();
     for (const auto &val : doc.array())
         m_entries.append(AppEntry::fromJson(val.toObject()));
+    rebuildFilter();
     endResetModel();
     emit countChanged();
 }

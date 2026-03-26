@@ -23,7 +23,12 @@ ApplicationWindow {
                 fillMode: Image.PreserveAspectFit
             }
 
-            Item { Layout.fillWidth: true }
+            TextField {
+                id: searchField
+                Layout.fillWidth: true
+                placeholderText: "Search..."
+                onTextChanged: appModel.setFilterString(text)
+            }
 
             Button {
                 text: "Add App/Game"

@@ -98,6 +98,10 @@ QStringList ProtonScanner::findProtonVersions() const {
 }
 
 
+QString ProtonScanner::homePath() const {
+    return QDir::homePath();
+}
+
 QString ProtonScanner::prefixBasePath() const {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/prefixes";
 }

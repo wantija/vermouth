@@ -51,6 +51,7 @@ Dialog {
     FileDialog {
         id: fileDialog
         title: "Select Executable"
+        currentFolder: "file://" + protonScanner.homePath()
         nameFilters: ["Executables (*.exe)", "All files (*)"]
         onAccepted: exeField.text = selectedFile.toString().replace("file://", "")
     }

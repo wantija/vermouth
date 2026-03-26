@@ -197,7 +197,7 @@ Dialog {
                     textRole: "label"
                 }
 
-                Label { text: "Proton Prefix (STEAM_COMPAT_DATA_PATH)"; font.pixelSize: 12 }
+                Label { text: "Proton Prefix (optional)"; font.pixelSize: 12 }
                 RowLayout {
                     Layout.fillWidth: true
                     TextField {
@@ -254,10 +254,6 @@ Dialog {
                 placeholderText: "e.g. mangohud %command%"
             }
 
-            CheckBox {
-                id: enableLoggingCheck
-                text: "Write output to log file"
-            }
 
             Label { text: "Icon (optional)"; font.pixelSize: 12 }
             RowLayout {
@@ -272,12 +268,18 @@ Dialog {
                     onClicked: iconFileDialog.open()
                 }
             }
+
+            CheckBox {
+                id: enableLoggingCheck
+                text: "Write output to log file"
+            }
         }
     }
 
     FileDialog {
         id: exeFileDialog
         title: "Select Executable"
+        currentFolder: "file://" + protonScanner.homePath()
         nameFilters: ["Executables (*.exe)", "All files (*)"]
         onAccepted: {
             var path = selectedFile.toString().replace("file://", "")
@@ -306,22 +308,26 @@ Dialog {
     FileDialog {
         id: wineBinaryDialog
         title: "Select Wine Binary"
+        currentFolder: "file://" + protonScanner.homePath()
         onAccepted: wineBinaryField.text = selectedFile.toString().replace("file://", "")
     }
     FileDialog {
         id: iconFileDialog
         title: "Select Icon"
+        currentFolder: "file://" + protonScanner.homePath()
         nameFilters: ["Images (*.png *.svg *.ico *.jpg)", "All files (*)"]
         onAccepted: iconField.text = selectedFile.toString().replace("file://", "")
     }
     FolderDialog {
         id: prefixFolderDialog
         title: "Select Proton Prefix Directory"
+        currentFolder: "file://" + protonScanner.homePath()
         onAccepted: protonPrefixField.text = selectedFolder.toString().replace("file://", "")
     }
     FolderDialog {
         id: winePrefixFolderDialog
         title: "Select Wine Prefix Directory"
+        currentFolder: "file://" + protonScanner.homePath()
         onAccepted: winePrefixField.text = selectedFolder.toString().replace("file://", "")
     }
 }
