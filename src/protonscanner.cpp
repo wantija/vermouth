@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QStandardPaths>
 #include <QTextStream>
 
 ProtonScanner::ProtonScanner(QObject *parent)
@@ -96,6 +97,12 @@ QStringList ProtonScanner::findProtonVersions() const {
     return result;
 }
 
+
+QString ProtonScanner::prefixBasePath() const {
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/prefixes";
+}
+
+
 QStringList ProtonScanner::findExistingPrefixes() const {
     QStringList result;
 
@@ -110,7 +117,7 @@ QStringList ProtonScanner::findExistingPrefixes() const {
         }
     }
 
-    QString dataHome = QDir::homePath() + "/.local/share/vermouth/prefixes";
+    QString dataHome = ProtonScanner::prefixBasePath();
     QDir customDir(dataHome);
     if (customDir.exists()) {
         for (const auto &entry : customDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
@@ -120,8 +127,4 @@ QStringList ProtonScanner::findExistingPrefixes() const {
     result.removeDuplicates();
     result.sort();
     return result;
-}
-
-QString ProtonScanner::prefixBasePath() const {
-    return QDir::homePath() + "/.local/share/vermouth/prefixes";
 }
