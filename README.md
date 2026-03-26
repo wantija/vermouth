@@ -5,7 +5,7 @@
 <h1 align="center">Vermouth</h1>
 
 <p align="center">A no-frills game (or any Windows exe) launcher for Linux.<br>
-Point it at Windows executables and run them with Proton or Wine - no Steam required.</p>
+Point it at Windows executables and run them with Proton or Wine.</p>
 
 <p align="center">
   <img src="assets/screenshot.png" alt="Vermouth screenshot" width="700">
@@ -13,15 +13,16 @@ Point it at Windows executables and run them with Proton or Wine - no Steam requ
 
 ## What it does
 
-Vermouth keeps a list of your games and applications, paired with a Proton or Wine version. Double-click to launch. That's pretty much it. It does everything Lutris or Heroic does, except it's much lighter, built on Qt and it lets other apps manage the compatibility tools (e.g. Steam, Protonup-qt etc.).
+Vermouth keeps a list of your games and applications, paired with a Proton or Wine version. Double-click to launch. That's pretty much it.
+It works like Lutris, Heroic and bottles, but it tries to be lighter and easier to use - it lets other apps manage the compatibility tools (e.g. Steam, Protonup-qt etc.) and the complex stuff.
 
 - Picks up Proton versions from your Steam installation automatically, including custom ones like GE-Proton from compatibilitytools.d and across multiple Steam library folders
 - Wine works too - just point it at the Wine binary and set a prefix folder
-- Extracts icons from .exe files so the grid actually looks nice
+- Tries to extract icons from .exe files so the grid actually looks nice
 - Launch options with `%command%` placeholder, same as Steam (e.g. `mangohud %command%`)
 - Run a separate .exe inside an existing prefix (useful for installers, config tools, etc.)
 - Create start menu entries or desktop shortcuts for individual games
-- Can be launched from .desktop files directly via CLI flags, so shortcuts work without the main window
+- Can be launched from .desktop files directly, so shortcuts work without the main window
 
 ## Building
 
