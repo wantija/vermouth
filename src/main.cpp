@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     parser.addOption(protonOpt);
     parser.addOption(wineOpt);
     parser.addOption(prefixOpt);
+    parser.addPositionalArgument("uri", "File or URI to open", "[uri...]");
     parser.process(app);
 
     Launcher launcher;

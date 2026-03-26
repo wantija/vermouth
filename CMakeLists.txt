@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Gui Widgets QuickControls2)
 
 qt_add_executable(vermouth
@@ -23,11 +22,13 @@ qt_add_executable(vermouth
 qt_add_qml_module(vermouth
     URI Vermouth
     VERSION 1.0
+    RESOURCE_PREFIX /qt/qml
     QML_FILES
         qml/Main.qml
         qml/AppGridView.qml
         qml/AddAppDialog.qml
         qml/RunExeDialog.qml
+    NO_RESOURCE_TARGET_PATH
 )
 
 target_link_libraries(vermouth PRIVATE
@@ -46,4 +47,5 @@ target_compile_definitions(vermouth PRIVATE
 )
 
 install(TARGETS vermouth DESTINATION bin)
-install(FILES assets/vermouth.svg DESTINATION share/icons/hicolor/scalable/apps RENAME vermouth.svg)
+install(FILES assets/vermouth.desktop DESTINATION share/applications)
+install(FILES assets/vermouth.svg DESTINATION share/icons/hicolor/scalable/apps)
