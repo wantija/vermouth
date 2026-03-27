@@ -49,3 +49,22 @@ target_compile_definitions(vermouth PRIVATE
 install(TARGETS vermouth DESTINATION bin)
 install(FILES assets/vermouth.desktop DESTINATION share/applications)
 install(FILES assets/vermouth.svg DESTINATION share/icons/hicolor/scalable/apps)
+
+
+
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_CONTACT "deko@duck.com")
+set(CPACK_PACKAGE_RELEASE 1)
+set(CPACK_PACKAGE_DESCRIPTION "")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A simple addition library.")
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/dekomote/vermouth/")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-base, qt6-declarative, qt6-quickcontrols2")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "x86_64")
+set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase, qt6-qtdeclarative, qt6-qtquickcontrols2")
+set(CPACK_RPM_PACKAGE_RECOMMENDS "icoutils")
+set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
+set(CPACK_GENERATOR "DEB;RPM")
+
+include(CPack)

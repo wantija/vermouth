@@ -70,7 +70,8 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty("desktopWriter", &desktopWriter);
     engine.rootContext()->setContextProperty("iconExtractor", &iconExtractor);
 
-    engine.loadFromModule("Vermouth", "Main");
+    engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
+    // engine.loadFromModule("Vermouth", "Main");
 
     if (engine.rootObjects().isEmpty())
         return -1;

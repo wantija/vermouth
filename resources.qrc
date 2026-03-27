@@ -2,4 +2,10 @@
     <qresource prefix="/icons">
         <file alias="vermouth.svg">assets/vermouth.svg</file>
     </qresource>
+    <qresource prefix="/">
+        <file>qml/AddAppDialog.qml</file>
+        <file>qml/AppGridView.qml</file>
+        <file>qml/RunExeDialog.qml</file>
+        <file>qml/Main.qml</file>
+    </qresource>
 </RCC>

@@ -55,6 +55,8 @@ Thumbs.db
 *~
 
 *.flatpak
-repo/
+flatpakrepo
+flatpakbuild
 .flatpak-builder
+
 rpmbuild

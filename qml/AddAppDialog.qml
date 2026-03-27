@@ -8,7 +8,6 @@ Dialog {
     title: editMode ? "Edit App/Game" : "Add App/Game"
     modal: true
     width: 520
-    height: contentItem.formLayout.implicitHeight + 20
     anchors.centerIn: parent
     standardButtons: Dialog.NoButton
 
