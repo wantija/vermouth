@@ -8,7 +8,7 @@ Dialog {
     title: editMode ? "Edit App/Game" : "Add App/Game"
     modal: true
     width: 520
-    height: 600
+    height: contentItem.formLayout.implicitHeight + 20
     anchors.centerIn: parent
     standardButtons: Dialog.NoButton
 
@@ -136,9 +136,7 @@ Dialog {
 
     ListModel { id: protonModel }
 
-    contentItem: Flickable {
-        contentHeight: formLayout.implicitHeight
-        clip: true
+    contentItem: Column {
 
         ColumnLayout {
             id: formLayout

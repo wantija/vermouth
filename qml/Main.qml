@@ -4,17 +4,17 @@ import QtQuick.Layouts
 
 ApplicationWindow {
     id: root
-    width: 800
-    height: 800
-    minimumWidth: 500
-    minimumHeight: 400
+    width: 600
+    height: 700
+    minimumWidth: 600
+    minimumHeight: 700
     visible: true
     title: "Vermouth"
 
     header: ToolBar {
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 8
+            anchors.margins: 3
 
             Image {
                 source: "qrc:/icons/vermouth.svg"
