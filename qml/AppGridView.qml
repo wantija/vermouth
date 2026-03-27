@@ -10,6 +10,14 @@ GridView {
     cellHeight: 170
     clip: true
 
+    property int selectedIndex: -1
+
+    MouseArea {
+        anchors.fill: parent
+        z: -1
+        onClicked: gridView.selectedIndex = -1
+    }
+
     delegate: Item {
         id: delegateRoot
         width: gridView.cellWidth
@@ -27,6 +35,8 @@ GridView {
         required property string launchOptions
         required property bool enableLogging
 
+        property bool isSelected: gridView.selectedIndex === delegateRoot.index
+
         Rectangle {
             id: card
             anchors.fill: parent
@@ -39,7 +49,7 @@ GridView {
                 anchors.fill: parent
                 radius: 10
                 color: "transparent"
-                border.color: mouseArea.containsMouse ? palette.highlight : "transparent"
+                border.color: delegateRoot.isSelected ? palette.highlight : mouseArea.containsMouse ? palette.highlight : "transparent"
                 border.width: 2
             }
         }
@@ -50,6 +60,11 @@ GridView {
             anchors.margins: 6
             radius: 10
             color: palette.button
+            border.color: delegateRoot.isSelected ? palette.highlight : mouseArea.containsMouse ? Qt.darker(palette.highlight, 1.5) : "transparent"
+            border.width: delegateRoot.isSelected ? 2 : mouseArea.containsMouse ? 1 : 0
+
+            Behavior on border.color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
+            Behavior on border.width { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
             scale: 1.0
             transformOrigin: Item.Center
 
@@ -152,7 +167,10 @@ GridView {
                 }
 
                 onClicked: function(mouse) {
-                    if (mouse.button === Qt.RightButton) {
+                    if (mouse.button === Qt.LeftButton) {
+                        gridView.selectedIndex = delegateRoot.index
+                    } else if (mouse.button === Qt.RightButton) {
+                        gridView.selectedIndex = delegateRoot.index
                         contextMenu.popup()
                     }
                 }
