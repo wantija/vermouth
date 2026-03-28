@@ -9,22 +9,21 @@ Kirigami.Dialog {
     title: "Run EXE in Prefix"
     preferredWidth: Kirigami.Units.gridUnit * 26
     padding: Kirigami.Units.largeSpacing
-
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
 
     property int appIndex: -1
 
     onAccepted: {
         if (appIndex >= 0 && exeField.text !== "") {
-            var app = appModel.getApp(appIndex)
-            launcher.runInPrefix(app, exeField.text)
+            var app = appModel.getApp(appIndex);
+            launcher.runInPrefix(app, exeField.text);
         }
     }
 
     onOpened: exeField.text = ""
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: Kirigami.Units.largeSpacing
 
         QQC2.Label {
             text: dialog.appIndex >= 0 ? "Run an executable using the same prefix as \"" + appModel.getApp(dialog.appIndex).name + "\"" : ""
@@ -33,6 +32,7 @@ Kirigami.Dialog {
         }
 
         Kirigami.FormLayout {
+            Layout.topMargin: Kirigami.Units.largeSpacing
             RowLayout {
                 Kirigami.FormData.label: "Executable (.exe):"
                 QQC2.TextField {

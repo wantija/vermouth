@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import QtQuick.Dialogs
 import org.kde.kirigami as Kirigami
 
 GridView {
@@ -47,13 +46,35 @@ GridView {
             border.color: delegateRoot.isSelected ? Kirigami.Theme.highlightColor : mouseArea.containsMouse ? Qt.darker(Kirigami.Theme.highlightColor, 1.5) : "transparent"
             border.width: delegateRoot.isSelected ? 2 : mouseArea.containsMouse ? 1 : 0
 
-            Behavior on border.color { ColorAnimation { duration: 150; easing.type: Easing.OutCubic } }
-            Behavior on border.width { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+            Behavior on border.color {
+                ColorAnimation {
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                }
+            }
+            Behavior on border.width {
+                NumberAnimation {
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             SequentialAnimation {
                 id: launchAnim
-                NumberAnimation { target: cardBg; property: "scale"; to: 0.9; duration: 100; easing.type: Easing.InQuad }
-                NumberAnimation { target: cardBg; property: "scale"; to: 1.0; duration: 200; easing.type: Easing.OutBack }
+                NumberAnimation {
+                    target: cardBg
+                    property: "scale"
+                    to: 0.9
+                    duration: 100
+                    easing.type: Easing.InQuad
+                }
+                NumberAnimation {
+                    target: cardBg
+                    property: "scale"
+                    to: 1.0
+                    duration: 200
+                    easing.type: Easing.OutBack
+                }
             }
 
             Rectangle {
@@ -66,8 +87,19 @@ GridView {
 
                 SequentialAnimation {
                     id: flashAnim
-                    NumberAnimation { target: launchFlash; property: "opacity"; to: 0.3; duration: 80 }
-                    NumberAnimation { target: launchFlash; property: "opacity"; to: 0; duration: 300; easing.type: Easing.OutCubic }
+                    NumberAnimation {
+                        target: launchFlash
+                        property: "opacity"
+                        to: 0.3
+                        duration: 80
+                    }
+                    NumberAnimation {
+                        target: launchFlash
+                        property: "opacity"
+                        to: 0
+                        duration: 300
+                        easing.type: Easing.OutCubic
+                    }
                 }
             }
 
@@ -118,10 +150,10 @@ GridView {
                 QQC2.Label {
                     text: {
                         if (delegateRoot.runtimeType === "proton") {
-                            var parts = delegateRoot.protonPath.split("/")
-                            return parts[parts.length - 1]
+                            var parts = delegateRoot.protonPath.split("/");
+                            return parts[parts.length - 1];
                         }
-                        return "Wine"
+                        return "Wine";
                     }
                     font.pixelSize: 10
                     color: Kirigami.Theme.disabledTextColor
@@ -138,21 +170,21 @@ GridView {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 cursorShape: Qt.PointingHandCursor
 
-                onDoubleClicked: function(mouse) {
+                onDoubleClicked: function (mouse) {
                     if (mouse.button === Qt.LeftButton) {
-                        launchAnim.start()
-                        flashAnim.start()
-                        var app = appModel.getApp(delegateRoot.index)
-                        launcher.launchEntry(app)
+                        launchAnim.start();
+                        flashAnim.start();
+                        var app = appModel.getApp(delegateRoot.index);
+                        launcher.launchEntry(app);
                     }
                 }
 
-                onClicked: function(mouse) {
+                onClicked: function (mouse) {
                     if (mouse.button === Qt.LeftButton) {
-                        gridView.selectedIndex = delegateRoot.index
+                        gridView.selectedIndex = delegateRoot.index;
                     } else if (mouse.button === Qt.RightButton) {
-                        gridView.selectedIndex = delegateRoot.index
-                        contextMenu.popup()
+                        gridView.selectedIndex = delegateRoot.index;
+                        contextMenu.popup();
                     }
                 }
             }
@@ -164,10 +196,10 @@ GridView {
                 text: "Launch"
                 icon.name: "media-playback-start"
                 onTriggered: {
-                    launchAnim.start()
-                    flashAnim.start()
-                    var app = appModel.getApp(delegateRoot.index)
-                    launcher.launchEntry(app)
+                    launchAnim.start();
+                    flashAnim.start();
+                    var app = appModel.getApp(delegateRoot.index);
+                    launcher.launchEntry(app);
                 }
             }
             QQC2.MenuSeparator {}
@@ -175,8 +207,8 @@ GridView {
                 text: "Run another EXE in this prefix"
                 icon.name: "system-run"
                 onTriggered: {
-                    runExeDialog.appIndex = delegateRoot.index
-                    runExeDialog.open()
+                    runExeDialog.appIndex = delegateRoot.index;
+                    runExeDialog.open();
                 }
             }
             QQC2.MenuSeparator {}
@@ -184,16 +216,16 @@ GridView {
                 text: "Create start menu entry"
                 icon.name: "application-menu"
                 onTriggered: {
-                    var app = appModel.getApp(delegateRoot.index)
-                    desktopWriter.createStartMenuEntry(app)
+                    var app = appModel.getApp(delegateRoot.index);
+                    desktopWriter.createStartMenuEntry(app);
                 }
             }
             QQC2.MenuItem {
                 text: "Create desktop shortcut"
                 icon.name: "user-desktop"
                 onTriggered: {
-                    var app = appModel.getApp(delegateRoot.index)
-                    desktopWriter.createDesktopShortcut(app)
+                    var app = appModel.getApp(delegateRoot.index);
+                    desktopWriter.createDesktopShortcut(app);
                 }
             }
             QQC2.MenuItem {
@@ -205,9 +237,9 @@ GridView {
                 text: "Open prefix folder"
                 icon.name: "folder-open"
                 onTriggered: {
-                    var prefix = delegateRoot.runtimeType === "proton" ? delegateRoot.protonPrefix : delegateRoot.winePrefix
+                    var prefix = delegateRoot.runtimeType === "proton" ? delegateRoot.protonPrefix : delegateRoot.winePrefix;
                     if (prefix !== "")
-                        Qt.openUrlExternally("file://" + prefix)
+                        Qt.openUrlExternally("file://" + prefix);
                 }
                 enabled: (delegateRoot.runtimeType === "proton" ? delegateRoot.protonPrefix : delegateRoot.winePrefix) !== ""
             }
@@ -221,24 +253,24 @@ GridView {
                 text: "Remove"
                 icon.name: "edit-delete"
                 onTriggered: {
-                    confirmDeleteAppDialog.payload = delegateRoot.index
-                    confirmDeleteAppDialog.open()
+                    confirmDeleteAppDialog.payload = delegateRoot.index;
+                    confirmDeleteAppDialog.open();
                 }
             }
             QQC2.MenuItem {
                 text: "Remove and Delete Prefix"
                 icon.name: "edit-delete"
                 onTriggered: {
-                    confirmDeleteDialog.payload = delegateRoot.index
-                    confirmDeleteDialog.open()
+                    confirmDeleteDialog.payload = delegateRoot.index;
+                    confirmDeleteDialog.open();
                 }
             }
         }
     }
 
     Kirigami.PromptDialog {
-        property var payload
         id: confirmDeleteDialog
+        property var payload
         title: "Delete both app and prefix?"
         subtitle: "This will delete both the app and the prefix?"
         onAccepted: appModel.removeAndCleanApp(payload)
@@ -246,8 +278,8 @@ GridView {
     }
 
     Kirigami.PromptDialog {
-        property var payload
         id: confirmDeleteAppDialog
+        property var payload
         title: "Delete the app?"
         subtitle: "This will delete the app but preserve the prefix folder."
         onAccepted: appModel.removeApp(payload)

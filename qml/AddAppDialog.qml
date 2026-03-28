@@ -9,7 +9,6 @@ Kirigami.Dialog {
     title: editMode ? "Edit App/Game" : "Add App/Game"
     preferredWidth: Kirigami.Units.gridUnit * 30
     padding: Kirigami.Units.largeSpacing
-    modal: true
     standardButtons: Kirigami.Dialog.NoButton
 
     customFooterActions: [
@@ -18,8 +17,8 @@ Kirigami.Dialog {
             icon.name: "dialog-ok"
             onTriggered: {
                 if (dialog.validate()) {
-                    dialog.doSave()
-                    dialog.close()
+                    dialog.doSave();
+                    dialog.close();
                 }
             }
         },
@@ -34,57 +33,57 @@ Kirigami.Dialog {
     property int editIndex: -1
 
     function openForNew() {
-        editMode = false
-        editIndex = -1
-        nameField.text = ""
-        exeField.text = ""
-        runtimeCombo.currentIndex = 0
-        protonCombo.currentIndex = -1
-        protonPrefixField.text = ""
-        wineBinaryField.text = ""
-        winePrefixField.text = ""
-        launchOptionsField.text = ""
-        enableLoggingCheck.checked = false
-        iconField.text = ""
-        refreshProton()
-        dialog.open()
+        editMode = false;
+        editIndex = -1;
+        nameField.text = "";
+        exeField.text = "";
+        runtimeCombo.currentIndex = 0;
+        protonCombo.currentIndex = -1;
+        protonPrefixField.text = "";
+        wineBinaryField.text = "";
+        winePrefixField.text = "";
+        launchOptionsField.text = "";
+        enableLoggingCheck.checked = false;
+        iconField.text = "";
+        refreshProton();
+        dialog.open();
     }
 
     function openForEdit(index) {
-        editMode = true
-        editIndex = index
-        var app = appModel.getApp(index)
-        nameField.text = app.name
-        exeField.text = app.exePath
-        runtimeCombo.currentIndex = app.runtimeType === "proton" ? 0 : 1
-        protonPrefixField.text = app.protonPrefix
-        wineBinaryField.text = app.wineBinary
-        winePrefixField.text = app.winePrefix
-        launchOptionsField.text = app.launchOptions
-        enableLoggingCheck.checked = app.enableLogging
-        iconField.text = app.iconPath
-        refreshProton()
+        editMode = true;
+        editIndex = index;
+        var app = appModel.getApp(index);
+        nameField.text = app.name;
+        exeField.text = app.exePath;
+        runtimeCombo.currentIndex = app.runtimeType === "proton" ? 0 : 1;
+        protonPrefixField.text = app.protonPrefix;
+        wineBinaryField.text = app.wineBinary;
+        winePrefixField.text = app.winePrefix;
+        launchOptionsField.text = app.launchOptions;
+        enableLoggingCheck.checked = app.enableLogging;
+        iconField.text = app.iconPath;
+        refreshProton();
 
         if (app.runtimeType === "proton") {
             for (var i = 0; i < protonModel.count; i++) {
                 if (protonModel.get(i).path === app.protonPath) {
-                    protonCombo.currentIndex = i
-                    break
+                    protonCombo.currentIndex = i;
+                    break;
                 }
             }
         }
-        dialog.open()
+        dialog.open();
     }
 
     function refreshProton() {
-        protonModel.clear()
-        var versions = protonScanner.findProtonVersions()
+        protonModel.clear();
+        var versions = protonScanner.findProtonVersions();
         for (var i = 0; i < versions.length; i++) {
-            var parts = versions[i].split("/")
+            var parts = versions[i].split("/");
             protonModel.append({
                 "label": parts[parts.length - 1],
                 "path": versions[i]
-            })
+            });
         }
     }
 
@@ -92,50 +91,44 @@ Kirigami.Dialog {
 
     function validate() {
         if (nameField.text.trim() === "") {
-            validationError = "Name is required."
-            return false
+            validationError = "Name is required.";
+            return false;
         }
         if (exeField.text.trim() === "") {
-            validationError = "Executable path is required."
-            return false
+            validationError = "Executable path is required.";
+            return false;
         }
         if (runtimeCombo.currentIndex === 0) {
             if (protonCombo.currentIndex < 0 || protonCombo.currentIndex >= protonModel.count) {
-                validationError = "Please select a Proton version."
-                return false
+                validationError = "Please select a Proton version.";
+                return false;
             }
         } else {
             if (wineBinaryField.text.trim() === "") {
-                validationError = "Wine binary path is required."
-                return false
+                validationError = "Wine binary path is required.";
+                return false;
             }
         }
-        validationError = ""
-        return true
+        validationError = "";
+        return true;
     }
 
     function doSave() {
-        var rt = runtimeCombo.currentIndex === 0 ? "proton" : "wine"
-        var protonPath = ""
+        var rt = runtimeCombo.currentIndex === 0 ? "proton" : "wine";
+        var protonPath = "";
         if (protonCombo.currentIndex >= 0 && protonCombo.currentIndex < protonModel.count)
-            protonPath = protonModel.get(protonCombo.currentIndex).path
+            protonPath = protonModel.get(protonCombo.currentIndex).path;
 
         if (editMode) {
-            appModel.editApp(editIndex, nameField.text, exeField.text, rt,
-                             protonPath, protonPrefixField.text,
-                             wineBinaryField.text, winePrefixField.text,
-                             iconField.text, launchOptionsField.text,
-                             enableLoggingCheck.checked)
+            appModel.editApp(editIndex, nameField.text, exeField.text, rt, protonPath, protonPrefixField.text, wineBinaryField.text, winePrefixField.text, iconField.text, launchOptionsField.text, enableLoggingCheck.checked);
         } else {
-            appModel.addApp(nameField.text, exeField.text, rt,
-                            protonPath, protonPrefixField.text,
-                            wineBinaryField.text, winePrefixField.text,
-                            iconField.text, launchOptionsField.text,
-                            enableLoggingCheck.checked)
+            appModel.addApp(nameField.text, exeField.text, rt, protonPath, protonPrefixField.text, wineBinaryField.text, winePrefixField.text, iconField.text, launchOptionsField.text, enableLoggingCheck.checked);
         }
     }
 
-    ListModel { id: protonModel }
+    ListModel {
+        id: protonModel
+    }
 
     ColumnLayout {
         spacing: Kirigami.Units.smallSpacing
@@ -174,7 +167,6 @@ Kirigami.Dialog {
                 model: ["Proton", "Wine"]
             }
 
-            // Proton settings
             RowLayout {
                 visible: runtimeCombo.currentIndex === 0
                 Kirigami.FormData.label: "Proton Version:"
@@ -212,7 +204,6 @@ Kirigami.Dialog {
                 }
             }
 
-            // Wine settings
             RowLayout {
                 visible: runtimeCombo.currentIndex === 1
                 Kirigami.FormData.label: "Wine Binary:"
@@ -273,32 +264,34 @@ Kirigami.Dialog {
         currentFolder: "file://" + protonScanner.homePath()
         nameFilters: ["Executables (*.exe)", "All files (*)"]
         onAccepted: {
-            var path = selectedFile.toString().replace("file://", "")
-            exeField.text = path
+            var path = selectedFile.toString().replace("file://", "");
+            exeField.text = path;
             if (iconField.text === "") {
-                var extracted = iconExtractor.extractIcon(path)
+                var extracted = iconExtractor.extractIcon(path);
                 if (extracted !== "")
-                    iconField.text = extracted
+                    iconField.text = extracted;
             }
             if (nameField.text === "") {
-                var parts = path.split("/")
-                var filename = parts[parts.length - 1]
-                nameField.text = filename.replace(/\.exe$/i, "")
+                var parts = path.split("/");
+                var filename = parts[parts.length - 1];
+                nameField.text = filename.replace(/\.exe$/i, "");
             }
-            var safeName = nameField.text.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase()
-            var prefixBase = protonScanner.prefixBasePath() + "/" + safeName
+            var safeName = nameField.text.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
+            var prefixBase = protonScanner.prefixBasePath() + "/" + safeName;
             if (protonPrefixField.text === "")
-                protonPrefixField.text = prefixBase
+                protonPrefixField.text = prefixBase;
             if (winePrefixField.text === "")
-                winePrefixField.text = prefixBase
+                winePrefixField.text = prefixBase;
         }
     }
+
     FileDialog {
         id: wineBinaryDialog
         title: "Select Wine Binary"
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: wineBinaryField.text = selectedFile.toString().replace("file://", "")
     }
+
     FileDialog {
         id: iconFileDialog
         title: "Select Icon"
@@ -306,12 +299,14 @@ Kirigami.Dialog {
         nameFilters: ["Images (*.png *.svg *.ico *.jpg)", "All files (*)"]
         onAccepted: iconField.text = selectedFile.toString().replace("file://", "")
     }
+
     FolderDialog {
         id: prefixFolderDialog
         title: "Select Proton Prefix Directory"
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: protonPrefixField.text = selectedFolder.toString().replace("file://", "")
     }
+
     FolderDialog {
         id: winePrefixFolderDialog
         title: "Select Wine Prefix Directory"
