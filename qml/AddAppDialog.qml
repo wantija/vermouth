@@ -9,6 +9,7 @@ Kirigami.Dialog {
     title: editMode ? i18n("Edit App/Game") : i18n("Add App/Game")
     preferredWidth: Kirigami.Units.gridUnit * 30
     padding: Kirigami.Units.largeSpacing
+    bottomPadding: 30
     standardButtons: Kirigami.Dialog.NoButton
 
     customFooterActions: [
@@ -131,7 +132,7 @@ Kirigami.Dialog {
     }
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: Kirigami.Units.mediumSpacing
 
         Kirigami.InlineMessage {
             Layout.fillWidth: true
@@ -142,8 +143,14 @@ Kirigami.Dialog {
 
         Kirigami.FormLayout {
 
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("Game")
+            }
+
             QQC2.TextField {
                 id: nameField
+                Layout.topMargin: 10
                 Kirigami.FormData.label: i18n("Name:")
                 placeholderText: i18n("My Game")
             }
@@ -159,6 +166,24 @@ Kirigami.Dialog {
                     icon.name: "document-open"
                     onClicked: exeFileDialog.open()
                 }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: i18n("Icon (optional):")
+                QQC2.TextField {
+                    id: iconField
+                    Layout.fillWidth: true
+                    placeholderText: "/path/to/icon.png"
+                }
+                QQC2.Button {
+                    icon.name: "document-open"
+                    onClicked: iconFileDialog.open()
+                }
+            }
+
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("Runtime")
             }
 
             QQC2.ComboBox {
@@ -232,23 +257,15 @@ Kirigami.Dialog {
                 }
             }
 
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("Options")
+            }
+
             QQC2.TextField {
                 id: launchOptionsField
                 Kirigami.FormData.label: i18n("Launch Options (optional):")
                 placeholderText: i18n("e.g. mangohud %command%")
-            }
-
-            RowLayout {
-                Kirigami.FormData.label: i18n("Icon (optional):")
-                QQC2.TextField {
-                    id: iconField
-                    Layout.fillWidth: true
-                    placeholderText: "/path/to/icon.png"
-                }
-                QQC2.Button {
-                    icon.name: "document-open"
-                    onClicked: iconFileDialog.open()
-                }
             }
 
             QQC2.CheckBox {

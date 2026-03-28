@@ -1,13 +1,21 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import Qt.labs.settings
 import org.kde.kirigami as Kirigami
 
 GridView {
     id: gridView
     model: appModel
-    cellWidth: 140
-    cellHeight: 170
+    property real scaleFactor: 1.0
+
+    Settings {
+        id: viewSettings
+        category: "GridView"
+        property alias scaleFactor: gridView.scaleFactor
+    }
+    cellWidth: 140 * scaleFactor
+    cellHeight: 170 * scaleFactor
     clip: true
 
     property int selectedIndex: -1
@@ -110,15 +118,15 @@ GridView {
 
                 Rectangle {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 80
-                    Layout.preferredHeight: 80
+                    Layout.preferredWidth: 80 * gridView.scaleFactor
+                    Layout.preferredHeight: 80 * gridView.scaleFactor
                     radius: Kirigami.Units.cornerRadius
                     color: Kirigami.Theme.alternateBackgroundColor
 
                     Image {
                         anchors.centerIn: parent
-                        width: 64
-                        height: 64
+                        width: 64 * gridView.scaleFactor
+                        height: 64 * gridView.scaleFactor
                         source: delegateRoot.iconPath !== "" ? "file://" + delegateRoot.iconPath : ""
                         visible: delegateRoot.iconPath !== ""
                         fillMode: Image.PreserveAspectFit
@@ -128,7 +136,7 @@ GridView {
                     QQC2.Label {
                         anchors.centerIn: parent
                         text: delegateRoot.name.charAt(0).toUpperCase()
-                        font.pixelSize: 32
+                        font.pixelSize: 32 * gridView.scaleFactor
                         font.bold: true
                         color: Kirigami.Theme.highlightColor
                         visible: delegateRoot.iconPath === ""
@@ -137,7 +145,7 @@ GridView {
 
                 QQC2.Label {
                     text: delegateRoot.name
-                    font.pixelSize: 12
+                    font.pixelSize: 12 * gridView.scaleFactor
                     font.bold: true
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
@@ -155,7 +163,7 @@ GridView {
                         }
                         return i18n("Wine");
                     }
-                    font.pixelSize: 10
+                    font.pixelSize: 10 * gridView.scaleFactor
                     color: Kirigami.Theme.disabledTextColor
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
