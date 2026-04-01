@@ -24,6 +24,9 @@ void AppModel::rebuildFilter() {
             m_entries[i].name.contains(m_filter, Qt::CaseInsensitive))
             m_filtered.append(i);
     }
+    std::sort(m_filtered.begin(), m_filtered.end(), [this](int a, int b) {
+        return m_entries[a].name.compare(m_entries[b].name, Qt::CaseInsensitive) < 0;
+    });
 }
 
 void AppModel::setFilterString(const QString &filter) {

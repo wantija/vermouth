@@ -20,10 +20,8 @@ GridView {
 
     property int selectedIndex: -1
 
-    MouseArea {
-        anchors.fill: parent
-        z: -1
-        onClicked: gridView.selectedIndex = -1
+    TapHandler {
+        onTapped: gridView.selectedIndex = -1
     }
 
     delegate: Item {
@@ -117,7 +115,7 @@ GridView {
                 spacing: Kirigami.Units.smallSpacing
 
                 Rectangle {
-                    Layout.alignment: Qt.AlignHCenter
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                     Layout.preferredWidth: 80 * gridView.scaleFactor
                     Layout.preferredHeight: 80 * gridView.scaleFactor
                     radius: Kirigami.Units.cornerRadius
@@ -149,8 +147,9 @@ GridView {
                     font.bold: true
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     Layout.fillWidth: true
-                    Layout.maximumHeight: 32
+                    Layout.maximumHeight: 50 * gridView.scaleFactor
                     wrapMode: Text.Wrap
                     maximumLineCount: 2
                 }
@@ -167,7 +166,9 @@ GridView {
                     color: Kirigami.Theme.disabledTextColor
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignBottom
                     Layout.fillWidth: true
+                    maximumLineCount: 1
                 }
             }
 

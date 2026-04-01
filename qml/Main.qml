@@ -67,7 +67,7 @@ Kirigami.ApplicationWindow {
                             return "";
                         var app = appModel.getApp(gridView.selectedIndex);
                         var runner = app.runtimeType === "proton" ? app.protonPath.split("/").pop() : app.wineBinary;
-                        return i18n("%1 — %2", runner, app.exePath);
+                        return i18n("%1 - %2", runner, app.exePath);
                     }
                     elide: Text.ElideMiddle
                     Layout.fillWidth: true
