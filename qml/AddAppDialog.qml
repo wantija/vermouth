@@ -134,6 +134,11 @@ Kirigami.Dialog {
         id: protonModel
     }
 
+    Connections {
+        target: protonDownloader
+        function onFinished() { dialog.refreshProton() }
+    }
+
     ColumnLayout {
         spacing: Kirigami.Units.mediumSpacing
 
@@ -203,11 +208,14 @@ Kirigami.Dialog {
                     Layout.fillWidth: true
                     model: protonModel
                     textRole: "label"
+                    displayText: protonModel.count === 0 ? i18n("No Proton versions found. Download GE Proton to get started - no Steam or manual setup needed.") : currentText
+                    QQC2.ToolTip.visible: hovered && protonModel.count === 0
+                    QQC2.ToolTip.text: protonModel.count === 0 ? i18n("No Proton versions found. Download GE Proton to get started - no Steam or manual setup needed.") : ""
                 }
                 QQC2.Button {
                     icon.name: "folder-open"
                     QQC2.ToolTip.visible: hovered
-                    QQC2.ToolTip.text: i18n("Open local Protons folder (%1)", protonScanner.localProtonPath())
+                    QQC2.ToolTip.text: i18n("Open Vermouth Proton folder (%1)", protonScanner.localProtonPath())
                     onClicked: Qt.openUrlExternally("file://" + protonScanner.localProtonPath())
                 }
                 QQC2.Button {
@@ -215,6 +223,13 @@ Kirigami.Dialog {
                     QQC2.ToolTip.visible: hovered
                     QQC2.ToolTip.text: i18n("Refresh Proton versions")
                     onClicked: dialog.refreshProton()
+                }
+                QQC2.Button {
+                    icon.name: "download"
+                    enabled: !protonDownloader.busy
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.text: protonDownloader.statusText ? protonDownloader.statusText : i18n("Download latest GE Proton")
+                    onClicked: protonDownloader.downloadLatest()
                 }
             }
 
@@ -322,14 +337,14 @@ Kirigami.Dialog {
 
     FolderDialog {
         id: prefixFolderDialog
-        title: i18n("Select Proton Prefix Directory")
+        title: i18n("Select Proton Prefix Folder")
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: protonPrefixField.text = selectedFolder.toString().replace("file://", "")
     }
 
     FolderDialog {
         id: winePrefixFolderDialog
-        title: i18n("Select Wine Prefix Directory")
+        title: i18n("Select Wine Prefix Folder")
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: winePrefixField.text = selectedFolder.toString().replace("file://", "")
     }

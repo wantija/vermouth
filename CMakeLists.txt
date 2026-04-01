@@ -29,7 +29,7 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMFindQmlModule)
 include(ECMQmlModule)
 
-find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Quick Gui Widgets QuickControls2)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Quick Gui Widgets QuickControls2 Network)
 find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS Kirigami CoreAddons I18n QQC2DesktopStyle)
 
 ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
@@ -43,6 +43,7 @@ qt_add_executable(vermouth
     src/desktopfilewriter.cpp
     src/iconextractor.cpp
     src/settingsmanager.cpp
+    src/protondownloader.cpp
     resources.qrc
 )
 
@@ -65,6 +66,7 @@ target_link_libraries(vermouth PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::QuickControls2
+    Qt6::Network
     KF6::Kirigami
     KF6::CoreAddons
     KF6::I18n

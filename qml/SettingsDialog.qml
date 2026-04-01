@@ -40,7 +40,7 @@ Kirigami.PromptDialog {
             }
 
             RowLayout {
-                Kirigami.FormData.label: i18n("Default Prefix Directory:")
+                Kirigami.FormData.label: i18n("Default Prefix Folder:")
                 QQC2.TextField {
                     id: prefixDirField
                     Layout.fillWidth: true
@@ -54,11 +54,35 @@ Kirigami.PromptDialog {
 
             Kirigami.Separator {
                 Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("Vermouth Proton Folder")
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: i18n("Download GE Proton to run most games and apps - no Steam or manual setup needed.")
+                QQC2.Button {
+                    icon.name: "folder-open"
+                    text: i18n("Open Vermouth Proton folder")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.text: protonScanner.localProtonPath()
+                    onClicked: Qt.openUrlExternally("file://" + protonScanner.localProtonPath())
+                }
+                QQC2.Button {
+                    text: i18n("Download Latest GE Proton")
+                    icon.name: "download"
+                    enabled: !protonDownloader.busy
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.text: protonDownloader.statusText ? protonDownloader.statusText : i18n("Download latest GE Proton")
+                    onClicked: protonDownloader.downloadLatest()
+                }
+            }
+
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
                 Kirigami.FormData.label: i18n("Extra Proton Scan Paths")
             }
 
             ColumnLayout {
-                Kirigami.FormData.label: i18n("Directories to scan for Proton installations (in addition to Steam and local paths).")
+                Kirigami.FormData.label: i18n("Folders to scan for Proton installations (in addition to Steam and local paths).")
                 Layout.fillWidth: true
                 Repeater {
                     model: pathsModel
@@ -90,14 +114,14 @@ Kirigami.PromptDialog {
 
     FolderDialog {
         id: prefixDirFolderDialog
-        title: i18n("Select Default Prefix Directory")
+        title: i18n("Select Default Prefix Folder")
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: prefixDirField.text = selectedFolder.toString().replace("file://", "")
     }
 
     FolderDialog {
         id: protonPathFolderDialog
-        title: i18n("Select Proton Scan Directory")
+        title: i18n("Select Proton Scan Folder")
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: {
             var path = selectedFolder.toString().replace("file://", "");

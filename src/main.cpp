@@ -13,6 +13,7 @@
 #include "desktopfilewriter.h"
 #include "iconextractor.h"
 #include "settingsmanager.h"
+#include "protondownloader.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -104,6 +105,8 @@ int main(int argc, char *argv[]) {
     DesktopFileWriter desktopWriter;
     IconExtractor iconExtractor;
     SettingsManager settingsManager;
+    ProtonDownloader protonDownloader;
+    protonDownloader.setLocalProtonPath(protonScanner.localProtonPath());
 
     protonScanner.setExtraProtonPaths(settingsManager.extraProtonPaths());
     protonScanner.setCustomPrefixBasePath(settingsManager.defaultPrefixDir());
@@ -122,6 +125,7 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty(QStringLiteral("desktopWriter"), &desktopWriter);
     engine.rootContext()->setContextProperty(QStringLiteral("iconExtractor"), &iconExtractor);
     engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);
+    engine.rootContext()->setContextProperty(QStringLiteral("protonDownloader"), &protonDownloader);
 
     engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
 
