@@ -12,9 +12,26 @@
   <description>
     <p>@APP_LONG_DESCRIPTION@</p>
   </description>
+  <url type="homepage">@APP_HOMEPAGE@</url>
+  <url type="bugtracker">@APP_BUG_ADDRESS@</url>
+  <url type="vcs-browser">@APP_HOMEPAGE@</url>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main game library view</caption>
+      <image>https://raw.githubusercontent.com/dekomote/vermouth/master/assets/screen1.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Game settings</caption>
+      <image>https://raw.githubusercontent.com/dekomote/vermouth/master/assets/screen3.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Application settings</caption>
+      <image>https://raw.githubusercontent.com/dekomote/vermouth/master/assets/screen2.png</image>
+    </screenshot>
+  </screenshots>
   <content_rating type="oars-1.1" />
   <releases>
-    <release version="@PROJECT_VERSION@" />
+    <release version="@PROJECT_VERSION@" date="@APP_RELEASE_DATE@" />
   </releases>
 </component>

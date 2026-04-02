@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v19.1.0
+    hooks:
+      - id: clang-format
+        types_or: [c++, c]
+
+  - repo: local
+    hooks:
+      - id: qmlformat
+        name: qmlformat
+        entry: qmlformat -i
+        language: system
+        files: '\.qml$'
+
+      - id: qmllint
+        name: qmllint
+        entry: qmllint
+        language: system
+        files: '\.qml$'
+
+      - id: check-version-consistency
+        name: check version consistency
+        entry: scripts/check-version-consistency.sh
+        language: script
+        always_run: true
+        pass_filenames: false

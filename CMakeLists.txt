@@ -18,6 +18,7 @@ set(APP_AUTHOR_NAME "Dejan Noveski")
 set(APP_AUTHOR_EMAIL "deko@duck.com")
 set(APP_AUTHOR_URL "https://github.com/dekomote")
 set(APP_COPYRIGHT "(c) 2026")
+string(TIMESTAMP APP_RELEASE_DATE "%Y-%m-%d")
 set(APP_LONG_DESCRIPTION "Vermouth is a no-frills lightweight game and application launcher that lets you run Windows executables through Proton or Wine on KDE.")
 
 find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
