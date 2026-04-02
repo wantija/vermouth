@@ -17,11 +17,18 @@ GridView {
     cellWidth: 140 * scaleFactor
     cellHeight: 170 * scaleFactor
     clip: true
+    focus: true
+    keyNavigationEnabled: true
 
-    property int selectedIndex: -1
+    property int selectedIndex: currentIndex
+
+    onCurrentIndexChanged: selectedIndex = currentIndex
 
     TapHandler {
-        onTapped: gridView.selectedIndex = -1
+        onTapped: {
+            gridView.currentIndex = -1;
+            gridView.selectedIndex = -1;
+        }
     }
 
     Shortcut {
@@ -67,7 +74,7 @@ GridView {
         required property string launchOptions
         required property bool enableLogging
 
-        property bool isSelected: gridView.selectedIndex === delegateRoot.index
+        property bool isSelected: gridView.currentIndex === delegateRoot.index
 
         Rectangle {
             id: cardBg
@@ -215,10 +222,9 @@ GridView {
                 }
 
                 onClicked: function (mouse) {
-                    if (mouse.button === Qt.LeftButton) {
-                        gridView.selectedIndex = delegateRoot.index;
-                    } else if (mouse.button === Qt.RightButton) {
-                        gridView.selectedIndex = delegateRoot.index;
+                    gridView.currentIndex = delegateRoot.index;
+                    gridView.forceActiveFocus();
+                    if (mouse.button === Qt.RightButton) {
                         contextMenu.popup();
                     }
                 }
