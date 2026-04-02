@@ -17,11 +17,43 @@ GridView {
     cellWidth: 140 * scaleFactor
     cellHeight: 170 * scaleFactor
     clip: true
+    focus: true
+    keyNavigationEnabled: true
 
-    property int selectedIndex: -1
+    property int selectedIndex: currentIndex
+
+    onCurrentIndexChanged: selectedIndex = currentIndex
 
     TapHandler {
-        onTapped: gridView.selectedIndex = -1
+        onTapped: {
+            gridView.currentIndex = -1;
+            gridView.selectedIndex = -1;
+        }
+    }
+
+    Shortcut {
+        sequence: "Return"
+        enabled: gridView.selectedIndex >= 0
+        onActivated: {
+            var app = appModel.getApp(gridView.selectedIndex);
+            launcher.launchEntry(app);
+        }
+    }
+    Shortcut {
+        sequence: "Delete"
+        enabled: gridView.selectedIndex >= 0
+        onActivated: {
+            confirmDeleteAppDialog.payload = gridView.selectedIndex;
+            confirmDeleteAppDialog.open();
+        }
+    }
+    Shortcut {
+        sequence: "Shift+Delete"
+        enabled: gridView.selectedIndex >= 0
+        onActivated: {
+            confirmDeleteDialog.payload = gridView.selectedIndex;
+            confirmDeleteDialog.open();
+        }
     }
 
     delegate: Item {
@@ -30,6 +62,7 @@ GridView {
         height: gridView.cellHeight
 
         required property int index
+        required property string appId
         required property string name
         required property string exePath
         required property string runtimeType
@@ -41,7 +74,7 @@ GridView {
         required property string launchOptions
         required property bool enableLogging
 
-        property bool isSelected: gridView.selectedIndex === delegateRoot.index
+        property bool isSelected: gridView.currentIndex === delegateRoot.index
 
         Rectangle {
             id: cardBg
@@ -189,10 +222,9 @@ GridView {
                 }
 
                 onClicked: function (mouse) {
-                    if (mouse.button === Qt.LeftButton) {
-                        gridView.selectedIndex = delegateRoot.index;
-                    } else if (mouse.button === Qt.RightButton) {
-                        gridView.selectedIndex = delegateRoot.index;
+                    gridView.currentIndex = delegateRoot.index;
+                    gridView.forceActiveFocus();
+                    if (mouse.button === Qt.RightButton) {
                         contextMenu.popup();
                     }
                 }
@@ -237,6 +269,40 @@ GridView {
                     desktopWriter.createDesktopShortcut(app);
                 }
             }
+            QQC2.Menu {
+                title: i18n("&Wine Utilities")
+                icon.name: "wine" // fallback icon
+
+                QQC2.MenuItem {
+                    text: i18n("Run Winecfg")
+                    icon.name: "preferences-system"
+                    onTriggered: {
+                        var app = appModel.getApp(delegateRoot.index);
+                        launcher.runWinecfg(app);
+                    }
+                }
+                QQC2.MenuItem {
+                    text: i18n("Run Regedit")
+                    icon.name: "document-edit"
+                    onTriggered: {
+                        var app = appModel.getApp(delegateRoot.index);
+                        launcher.runRegedit(app);
+                    }
+                }
+                QQC2.MenuItem {
+                    text: i18n("Run Winetricks")
+                    icon.name: "tools"
+                    onTriggered: {
+                        if (!launcher.isWinetricksAvailable()) {
+                            winetricksNotFoundDialog.open();
+                            return;
+                        }
+                        var app = appModel.getApp(delegateRoot.index);
+                        launcher.runWinetricks(app);
+                    }
+                }
+            }
+            QQC2.MenuSeparator {}
             QQC2.MenuItem {
                 text: i18n("Open log folder")
                 icon.name: "folder-open"
@@ -293,6 +359,13 @@ GridView {
         subtitle: i18n("This will delete the app but preserve the prefix folder.")
         onAccepted: appModel.removeApp(payload)
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+    }
+
+    Kirigami.PromptDialog {
+        id: winetricksNotFoundDialog
+        title: i18n("Winetricks not found")
+        subtitle: i18n("Winetricks is not installed on your system. Please install it using your package manager.")
+        standardButtons: Kirigami.Dialog.Ok
     }
 
     Kirigami.PlaceholderMessage {
