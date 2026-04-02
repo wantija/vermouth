@@ -16,9 +16,10 @@
 Point it at Windows executables and run them with Proton or Wine.</p>
 
 <p align="center">
-  <img src="assets/screen1.png" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen2.png" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen3.png" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen1.png?t=1.0" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen2.png?t=1.0" alt="Vermouth screenshot" width="400"><br>
+  <img src="assets/screen3.png?t=1.0" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen4.png?t=1.0" alt="Vermouth screenshot" width="400">
 </p>
 
 ## What it does
@@ -38,6 +39,7 @@ Additionally:
 - It will try to extract icons from .exe files so the grid actually looks nice, you just install `icoutils`
 - You can define launch options with `%command%` placeholder, same as in Steam (e.g. `mangohud %command%`)
 - You can run a separate .exe inside an existing prefix (useful for installers, config tools, etc.)
+- You can run the common wine utilities in the prefixes - winecfg, regedit, winetricks
 - You can create start menu entries and desktop shortcuts for individual games, and they work without opening the application window
 
 ## Installing
