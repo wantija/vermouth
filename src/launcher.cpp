@@ -1,10 +1,15 @@
 #include "launcher.h"
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusReply>
+#include <QDBusUnixFileDescriptor>
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QStandardPaths>
+#include <unistd.h>
 
 Launcher::Launcher(QObject *parent)
     : QObject(parent)
@@ -159,6 +164,37 @@ void Launcher::runWinetricks(const QVariantMap &app)
 bool Launcher::isWinetricksAvailable() const
 {
     return !QStandardPaths::findExecutable(QStringLiteral("winetricks")).isEmpty();
+}
+
+bool Launcher::sleepInhibited() const
+{
+    return m_inhibitFd >= 0;
+}
+
+void Launcher::toggleSleepInhibit()
+{
+    if (sleepInhibited()) {
+        ::close(m_inhibitFd);
+        m_inhibitFd = -1;
+        Q_EMIT sleepInhibitedChanged();
+        return;
+    }
+
+    QDBusInterface manager(QStringLiteral("org.freedesktop.login1"),
+                           QStringLiteral("/org/freedesktop/login1"),
+                           QStringLiteral("org.freedesktop.login1.Manager"),
+                           QDBusConnection::systemBus());
+
+    QDBusReply<QDBusUnixFileDescriptor> reply = manager.call(QStringLiteral("Inhibit"),
+                                                             QStringLiteral("idle:sleep"),
+                                                             QStringLiteral("Vermouth"),
+                                                             QStringLiteral("User requested sleep inhibition"),
+                                                             QStringLiteral("block"));
+
+    if (reply.isValid()) {
+        m_inhibitFd = ::dup(reply.value().fileDescriptor());
+        Q_EMIT sleepInhibitedChanged();
+    }
 }
 
 void Launcher::setupLogging(QProcess *proc, const QString &name)

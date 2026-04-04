@@ -23,6 +23,13 @@ Kirigami.ApplicationWindow {
                 onTriggered: runExeStandaloneDialog.openDialog()
             },
             Kirigami.Action {
+                text: launcher.sleepInhibited ? i18n("Allow Sleep") : i18n("Prevent Sleep")
+                icon.name: launcher.sleepInhibited ? "media-playback-pause" : "system-suspend-inhibited"
+                checkable: true
+                checked: launcher.sleepInhibited
+                onTriggered: launcher.toggleSleepInhibit()
+            },
+            Kirigami.Action {
                 text: i18n("&Settings")
                 icon.name: "configure"
                 onTriggered: settingsDialog.openDialog()

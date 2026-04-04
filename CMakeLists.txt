@@ -30,7 +30,7 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMFindQmlModule)
 include(ECMQmlModule)
 
-find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Quick Gui Widgets QuickControls2 Network)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Quick Gui Widgets QuickControls2 Network DBus)
 find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS Kirigami CoreAddons I18n QQC2DesktopStyle)
 
 ecm_find_qmlmodule(org.kde.kirigami REQUIRED)
@@ -68,6 +68,7 @@ target_link_libraries(vermouth PRIVATE
     Qt6::Widgets
     Qt6::QuickControls2
     Qt6::Network
+    Qt6::DBus
     KF6::Kirigami
     KF6::CoreAddons
     KF6::I18n

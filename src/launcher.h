@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDBusUnixFileDescriptor>
 #include <QObject>
 #include <QProcess>
 #include <QProcessEnvironment>
@@ -19,11 +20,16 @@ public:
     Q_INVOKABLE bool isWinetricksAvailable() const;
     Q_INVOKABLE QString logDir() const;
 
+    Q_PROPERTY(bool sleepInhibited READ sleepInhibited NOTIFY sleepInhibitedChanged)
+    Q_INVOKABLE void toggleSleepInhibit();
+    bool sleepInhibited() const;
+
 Q_SIGNALS:
     void launched(const QString &name);
     void launchError(const QString &name, const QString &error);
     void prefixNotReady(const QString &name);
     void processFinished(int exitCode);
+    void sleepInhibitedChanged();
 
 private:
     void launch(const QString &binary,
@@ -35,4 +41,5 @@ private:
                 const QString &logName);
     void setupLogging(QProcess *proc, const QString &name);
     QString m_logDir;
+    int m_inhibitFd = -1;
 };
