@@ -5,10 +5,10 @@ import org.kde.kirigami as Kirigami
 import com.dekomote.vermouth 1.0
 
 Kirigami.ApplicationWindow {
-    width: 600
-    height: 700
-    minimumWidth: 600
-    minimumHeight: 700
+    width: 700
+    height: 800
+    minimumWidth: 700
+    minimumHeight: 800
 
     globalDrawer: Kirigami.GlobalDrawer {
         actions: [
@@ -16,6 +16,18 @@ Kirigami.ApplicationWindow {
                 text: i18n("Add &App/Game")
                 icon.name: "list-add"
                 onTriggered: addDialog.openForNew()
+            },
+            Kirigami.Action {
+                text: i18n("Run &Standalone EXE")
+                icon.name: "system-run"
+                onTriggered: runExeStandaloneDialog.openDialog()
+            },
+            Kirigami.Action {
+                text: launcher.sleepInhibited ? i18n("Allow Sleep") : i18n("Prevent Sleep")
+                icon.name: launcher.sleepInhibited ? "media-playback-pause" : "system-suspend-inhibited"
+                checkable: true
+                checked: launcher.sleepInhibited
+                onTriggered: launcher.toggleSleepInhibit()
             },
             Kirigami.Action {
                 text: i18n("&Settings")
@@ -50,6 +62,14 @@ Kirigami.ApplicationWindow {
                 text: i18n("Add &App/Game")
                 icon.name: "list-add"
                 onClicked: addDialog.openForNew()
+            }
+            QQC2.Button {
+                icon.name: "media-playback-start"
+                enabled: gridView.selectedIndex >= 0
+                onClicked: {
+                    var app = appModel.getApp(gridView.selectedIndex);
+                    launcher.launchEntry(app);
+                }
             }
         }
 
@@ -104,6 +124,10 @@ Kirigami.ApplicationWindow {
         id: runExeDialog
     }
 
+    RunExeStandaloneDialog {
+        id: runExeStandaloneDialog
+    }
+
     SettingsDialog {
         id: settingsDialog
     }
@@ -120,6 +144,26 @@ Kirigami.ApplicationWindow {
         id: aboutPage
         Kirigami.AboutPage {
             aboutData: About
+        }
+    }
+
+    DropArea {
+        anchors.fill: parent
+        onDropped: function (drop) {
+            var path = "";
+            if (drop.hasUrls) {
+                path = decodeURIComponent(drop.urls[0].toString().replace("file://", ""));
+            } else if (drop.hasText) {
+                path = decodeURIComponent(drop.text.trim().replace("file://", ""));
+            }
+            if (path !== "")
+                runExeStandaloneDialog.openDialog(path);
+        }
+    }
+
+    Component.onCompleted: {
+        if (typeof openExePath !== "undefined" && openExePath !== "") {
+            runExeStandaloneDialog.openDialog(openExePath);
         }
     }
 

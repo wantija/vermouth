@@ -8,10 +8,12 @@ Kirigami.PromptDialog {
     id: dialog
     title: i18n("Settings")
     preferredWidth: Kirigami.Units.gridUnit * 30
-    padding: Kirigami.Units.largeSpacing
     bottomPadding: 30
     standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
-    onAccepted: settingsManager.setDefaultPrefixDir(prefixDirField.text)
+    onAccepted: {
+        settingsManager.setDefaultPrefixDir(prefixDirField.text);
+        defaultRuntimePicker.saveToSettings();
+    }
 
     function openDialog() {
         prefixDirField.text = settingsManager.defaultPrefixDir;
@@ -22,6 +24,7 @@ Kirigami.PromptDialog {
                 "path": paths[i]
             });
         }
+        defaultRuntimePicker.reset();
         dialog.open();
     }
 
@@ -30,9 +33,16 @@ Kirigami.PromptDialog {
     }
 
     ColumnLayout {
-        spacing: Kirigami.Units.mediumSpacing
+        spacing: Kirigami.Units.smallSpacing
+
+        RuntimePicker {
+            id: defaultRuntimePicker
+            Layout.fillWidth: true
+            sectionLabel: i18n("Default Runtime")
+        }
 
         Kirigami.FormLayout {
+            twinFormLayouts: defaultRuntimePicker.formLayout
 
             Kirigami.Separator {
                 Kirigami.FormData.isSection: true
@@ -116,7 +126,7 @@ Kirigami.PromptDialog {
         id: prefixDirFolderDialog
         title: i18n("Select Default Prefix Folder")
         currentFolder: "file://" + protonScanner.homePath()
-        onAccepted: prefixDirField.text = selectedFolder.toString().replace("file://", "")
+        onAccepted: prefixDirField.text = decodeURIComponent(selectedFolder.toString().replace("file://", ""))
     }
 
     FolderDialog {
@@ -124,7 +134,7 @@ Kirigami.PromptDialog {
         title: i18n("Select Proton Scan Folder")
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: {
-            var path = selectedFolder.toString().replace("file://", "");
+            var path = decodeURIComponent(selectedFolder.toString().replace("file://", ""));
             settingsManager.addExtraProtonPath(path);
             pathsModel.append({
                 "path": path
