@@ -137,7 +137,7 @@ void Launcher::runWinetricks(const QVariantMap &app)
     if (app[QStringLiteral("runtimeType")].toString() == QStringLiteral("proton")) {
         prefix = app[QStringLiteral("protonPrefix")].toString();
         QString pfxDir = prefix + QStringLiteral("/pfx");
-        if (!QFileInfo::exists(pfxDir + QStringLiteral("/pfx.lock"))) {
+        if (!QFileInfo::exists(prefix + QStringLiteral("/pfx.lock"))) {
             Q_EMIT prefixNotReady(app[QStringLiteral("name")].toString());
             proc->deleteLater();
             return;
