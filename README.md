@@ -15,10 +15,10 @@
 Point it at Windows executables and run them with Proton or Wine.</p>
 
 <p align="center">
-  <img src="assets/screen1.png?t=1.0" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen2.png?t=1.0" alt="Vermouth screenshot" width="400"><br>
-  <img src="assets/screen3.png?t=1.0" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen4.png?t=1.0" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen1.png?t=1.3" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen2.png?t=1.3" alt="Vermouth screenshot" width="400"><br>
+  <img src="assets/screen3.png?t=1.3" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen4.png?t=1.3" alt="Vermouth screenshot" width="400">
 </p>
 
 ## What it does
@@ -51,15 +51,10 @@ If `umu-run` is found in your `PATH` or configured in Settings, Vermouth will us
 
 ## Installing
 
-Download the latest package from the [releases page](https://github.com/dekomote/vermouth/releases/latest).
 
 ### Fedora and Nobara
 
-```bash
-sudo dnf install ./vermouth-*.rpm
-```
-
-Vermouth is also available on [COPR](https://copr.fedorainfracloud.org/coprs/dekomote/vermouth/):
+Vermouth is available on [COPR](https://copr.fedorainfracloud.org/coprs/dekomote/vermouth/):
 
 ```bash
 sudo dnf copr enable dekomote/vermouth
@@ -71,6 +66,12 @@ sudo dnf install vermouth
 ```bash
 sudo dnf5 copr enable dekomote/vermouth
 sudo rpm-ostree -y install vermouth
+```
+
+Also, you can download the latest package from the [releases page](https://github.com/dekomote/vermouth/releases/latest).
+
+```bash
+sudo dnf install ./vermouth-*.rpm
 ```
 
 ### OpenSUSE Tumbleweed
@@ -91,6 +92,7 @@ sudo zypper install ./vermouth-opensuse-*.rpm
 ### Ubuntu / Debian
 
 Requires Ubuntu 25.04 / Debian Trixie or newer (Qt 6.8+ and KF6 are required).
+Download the latest deb package from the [releases page](https://github.com/dekomote/vermouth/releases/latest).
 
 ```bash
 sudo apt install ./vermouth-*.deb
@@ -118,21 +120,17 @@ cd packaging && makepkg -si
 
 ### Flatpak
 
+Download the latest flatpak package from the [releases page](https://github.com/dekomote/vermouth/releases/latest).
+
 ```bash
 flatpak install ./vermouth-*.flatpak
-```
-
-Or install from Flathub (once available):
-
-```bash
-flatpak install flathub com.dekomote.vermouth
 ```
 
 See [FLATPAK NOTES](#flatpak-notes) for filesystem permissions required to access your games and Steam installation.
 
 ### AppImage
 
-Download `Vermouth-*.AppImage`, make it executable and run it:
+Download `Vermouth-*.AppImage` from the [releases page](https://github.com/dekomote/vermouth/releases/latest), make it executable and run it:
 
 ```bash
 chmod +x Vermouth-*.AppImage
@@ -143,7 +141,6 @@ chmod +x Vermouth-*.AppImage
 
 For icon extraction from .exe files, install `icoutils` (provides `wrestool` and `icotool`).
 
-I have limited testing capabilities at the moment, so please report any bugs you find.
 
 ## Building from source
 
@@ -176,6 +173,10 @@ cmake -B build
 cmake --build build
 ./build/bin/vermouth
 ```
+
+## Bug reporting and feature requests
+
+Please use the [issue tracker](https://github.com/dekomote/vermouth/issues) for bug reports and feature requests.
 
 ## How to use it
 
