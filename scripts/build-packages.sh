@@ -270,19 +270,125 @@ build_arch() {
     fi
 }
 
+# --- Flatpak ---
+build_flatpak() {
+    echo -e "\n${BOLD}=== Flatpak ===${RESET}"
+    echo "Image: fedora:43"
+
+    if ! "$CONTAINER_RT" pull --quiet "fedora:43" 2>/dev/null; then
+        skip "Flatpak (could not pull image)"
+        return
+    fi
+
+    local log rc
+    log=$("$CONTAINER_RT" run --rm --privileged \
+        -v "$PROJECT_DIR":/src:ro \
+        -v "$OUTPUT_DIR":/out \
+        fedora:43 \
+        bash -c "
+            set -euo pipefail
+            dnf upgrade --refresh -y --quiet
+            dnf install -y --quiet flatpak-builder
+            flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+            cp -r /src /build
+            cd /build
+            rm -rf build _build dist
+
+            flatpak-builder --force-clean --repo=flatpakrepo build-dir com.dekomote.vermouth.yml \
+                --install-deps-from=flathub --disable-rofiles-fuse
+            flatpak build-bundle flatpakrepo vermouth-${VERSION}.flatpak com.dekomote.vermouth
+            cp vermouth-*.flatpak /out/
+        " 2>&1) && rc=0 || rc=$?
+
+    if [ $rc -eq 0 ] && find "$OUTPUT_DIR" -maxdepth 1 -name "*.flatpak" | grep -q .; then
+        pass "Flatpak — package written to dist/"
+    else
+        fail "Flatpak build failed"
+        echo "$log" | tail -20 | sed 's/^/    /'
+    fi
+}
+
+# --- AppImage ---
+build_appimage() {
+    echo -e "\n${BOLD}=== AppImage ===${RESET}"
+    echo "Image: ubuntu:25.10"
+
+    if ! "$CONTAINER_RT" pull --quiet "ubuntu:25.10" 2>/dev/null; then
+        skip "AppImage (could not pull image)"
+        return
+    fi
+
+    local log rc
+    log=$("$CONTAINER_RT" run --rm \
+        -e DEBIAN_FRONTEND=noninteractive \
+        -v "$PROJECT_DIR":/src:ro \
+        -v "$OUTPUT_DIR":/out \
+        ubuntu:25.10 \
+        bash -c "
+            set -euo pipefail
+            apt-get update -qq
+            apt-get install -y -qq build-essential cmake extra-cmake-modules file wget fuse3 \
+                qt6-base-dev qt6-declarative-dev qt6-tools-dev-tools qmake6 \
+                libkirigami-dev libkf6coreaddons-dev libkf6i18n-dev libkf6qqc2desktopstyle-dev \
+                qml6-module-org-kde-kirigami qml6-module-org-kde-desktop \
+                qml6-module-org-kde-iconthemes qml6-module-org-kde-sonnet \
+                qt6-wayland breeze
+
+            cp -r /src /build
+            cd /build
+            rm -rf build _build dist
+
+            cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -Wno-dev
+            cmake --build build --parallel \$(nproc)
+            DESTDIR=AppDir cmake --install build
+
+            wget -q -O linuxdeploy 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage'
+            wget -q -O linuxdeploy-plugin-qt 'https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage'
+            chmod +x linuxdeploy linuxdeploy-plugin-qt
+            ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy-extracted
+            ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt-extracted
+            ln -s \"\$PWD/linuxdeploy-plugin-qt-extracted/AppRun\" linuxdeploy-extracted/plugins/linuxdeploy-plugin-qt
+
+            export QML_SOURCES_PATHS=/build/qml
+            export QMAKE=/usr/bin/qmake6
+            export EXTRA_QT_PLUGINS='svg;wayland-shell-integration;wayland-graphics-integration-client'
+            export APPIMAGE_EXTRACT_AND_RUN=1
+            export VERSION=${VERSION}
+
+            ./linuxdeploy-extracted/AppRun --appdir AppDir \
+                --desktop-file AppDir/usr/share/applications/com.dekomote.vermouth.desktop \
+                --icon-file AppDir/usr/share/icons/hicolor/scalable/apps/com.dekomote.vermouth.svg \
+                --plugin qt \
+                --output appimage
+            cp Vermouth-*.AppImage /out/
+        " 2>&1) && rc=0 || rc=$?
+
+    if [ $rc -eq 0 ] && find "$OUTPUT_DIR" -maxdepth 1 -name "*.AppImage" | grep -q .; then
+        pass "AppImage — package written to dist/"
+    else
+        fail "AppImage build failed"
+        echo "$log" | tail -20 | sed 's/^/    /'
+    fi
+}
+
 case "$TARGETS" in
     all)
         build_rpm_fedora
         build_rpm_opensuse
         build_deb
         build_arch
+        build_flatpak
+        build_appimage
         ;;
     fedora)   build_rpm_fedora ;;
     opensuse) build_rpm_opensuse ;;
     deb)      build_deb ;;
     arch)     build_arch ;;
+    flatpak)  build_flatpak ;;
+    appimage) build_appimage ;;
     *)
-        echo "Usage: $0 [all|fedora|opensuse|deb|arch]"
+        echo "Usage: $0 [all|fedora|opensuse|deb|arch|flatpak|appimage]"
         exit 1
         ;;
 esac
