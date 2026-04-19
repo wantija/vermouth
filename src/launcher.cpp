@@ -61,6 +61,11 @@ void Launcher::setUmuPath(const QString &path)
     m_umuPath = path;
 }
 
+void Launcher::setGlobalEnvVars(const QStringList &vars)
+{
+    m_globalEnvVars = vars;
+}
+
 QString Launcher::logDir() const
 {
     return m_logDir;
@@ -126,6 +131,12 @@ void Launcher::launchEntry(const QVariantMap &app)
     QString name = app[QStringLiteral("name")].toString();
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    for (const QString &kv : std::as_const(m_globalEnvVars)) {
+        int sep = kv.indexOf(QLatin1Char('='));
+        if (sep > 0)
+            env.insert(kv.left(sep), kv.mid(sep + 1));
+    }
 
     if (m_hdrEnabled) {
         env.insert(QStringLiteral("PROTON_ENABLE_HDR"), QStringLiteral("1"));

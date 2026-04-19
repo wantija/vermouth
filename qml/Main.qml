@@ -220,6 +220,16 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    function openExe(path) {
+        var existing = appModel.getAppByExePath(path);
+        if (existing && existing.exePath !== undefined) {
+            launcher.launchEntry(existing);
+        } else {
+            openExeChoiceDialog.exePath = path;
+            openExeChoiceDialog.open();
+        }
+    }
+
     DropArea {
         anchors.fill: parent
         onDropped: function (drop) {
@@ -229,25 +239,20 @@ Kirigami.ApplicationWindow {
             } else if (drop.hasText) {
                 path = decodeURIComponent(drop.text.trim().replace("file://", ""));
             }
-            if (path !== "") {
-                openExeChoiceDialog.exePath = path;
-                openExeChoiceDialog.open();
-            }
+            if (path !== "")
+                root.openExe(path);
         }
     }
 
     Component.onCompleted: {
-        if (typeof openExePath !== "undefined" && openExePath !== "") {
-            openExeChoiceDialog.exePath = openExePath;
-            openExeChoiceDialog.open();
-        }
+        if (typeof openExePath !== "undefined" && openExePath !== "")
+            root.openExe(openExePath);
     }
 
     Connections {
         target: singleInstance
         function onOpenExeRequested(path) {
-            openExeChoiceDialog.exePath = path;
-            openExeChoiceDialog.open();
+            root.openExe(path);
         }
         function onRaiseRequested() {
             root.raise();

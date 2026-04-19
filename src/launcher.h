@@ -13,6 +13,7 @@ public:
     explicit Launcher(QObject *parent = nullptr);
 
     void setUmuPath(const QString &path);
+    void setGlobalEnvVars(const QStringList &vars);
 
     Q_INVOKABLE void launchEntry(const QVariantMap &app);
     Q_INVOKABLE void runInPrefix(const QVariantMap &app, const QString &exePath);
@@ -53,6 +54,7 @@ private:
     void refreshHdrState();
     QString m_logDir;
     QString m_umuPath;
+    QStringList m_globalEnvVars;
     int m_inhibitFd = -1;
     bool m_hdrEnabled = false;
     bool m_hdrSupported = false;
