@@ -15,7 +15,7 @@ GridView {
         property alias scaleFactor: gridView.scaleFactor
     }
     cellWidth: 140 * scaleFactor
-    cellHeight: 170 * scaleFactor
+    cellHeight: 160 * scaleFactor
     clip: true
     focus: true
     keyNavigationEnabled: true
@@ -152,12 +152,12 @@ GridView {
                     Layout.preferredWidth: 80 * gridView.scaleFactor
                     Layout.preferredHeight: 80 * gridView.scaleFactor
                     radius: Kirigami.Units.cornerRadius
-                    color: Kirigami.Theme.alternateBackgroundColor
+                    color: delegateRoot.iconPath === "" ? Kirigami.Theme.alternateBackgroundColor : Kirigami.Theme.backgroundColor
 
                     Image {
                         anchors.centerIn: parent
-                        width: 64 * gridView.scaleFactor
-                        height: 64 * gridView.scaleFactor
+                        width: 70 * gridView.scaleFactor
+                        height: 70 * gridView.scaleFactor
                         source: delegateRoot.iconPath !== "" ? "file://" + delegateRoot.iconPath : ""
                         visible: delegateRoot.iconPath !== ""
                         fillMode: Image.PreserveAspectFit
@@ -182,26 +182,9 @@ GridView {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     Layout.fillWidth: true
-                    Layout.maximumHeight: 50 * gridView.scaleFactor
+                    Layout.fillHeight: true
                     wrapMode: Text.Wrap
                     maximumLineCount: 2
-                }
-
-                QQC2.Label {
-                    text: {
-                        if (delegateRoot.runtimeType === "proton") {
-                            var parts = delegateRoot.protonPath.split("/");
-                            return parts[parts.length - 1];
-                        }
-                        return i18n("Wine");
-                    }
-                    font.pixelSize: 10 * gridView.scaleFactor
-                    color: Kirigami.Theme.disabledTextColor
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignBottom
-                    Layout.fillWidth: true
-                    maximumLineCount: 1
                 }
             }
 
