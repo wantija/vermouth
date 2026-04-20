@@ -61,12 +61,12 @@ Kirigami.Dialog {
             var filename = parts[parts.length - 1];
             nameField.text = filename.replace(/\.exe$/i, "");
         }
-        var safeName = nameField.text.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
-        var prefixBase = dialog.prefixBasePath + "/" + safeName;
+        var defaultPrefix = settingsManager.defaultGamePrefix;
+        var resolvedPrefix = defaultPrefix !== "" ? defaultPrefix : dialog.prefixBasePath + "/" + nameField.text.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
         if (protonPrefixField.text === "")
-            protonPrefixField.text = prefixBase;
+            protonPrefixField.text = resolvedPrefix;
         if (winePrefixField.text === "")
-            winePrefixField.text = prefixBase;
+            winePrefixField.text = resolvedPrefix;
     }
 
     function openForNewWithExe(exePath) {
@@ -189,7 +189,7 @@ Kirigami.Dialog {
                 QQC2.TextField {
                     id: protonPrefixField
                     Layout.fillWidth: true
-                    placeholderText: dialog.prefixBasePath + "/mygame"
+                    placeholderText: settingsManager.defaultGamePrefix !== "" ? settingsManager.defaultGamePrefix : dialog.prefixBasePath + "/mygame"
                 }
                 QQC2.Button {
                     icon.name: "document-open"
@@ -203,7 +203,7 @@ Kirigami.Dialog {
                 QQC2.TextField {
                     id: winePrefixField
                     Layout.fillWidth: true
-                    placeholderText: "~/.wine"
+                    placeholderText: settingsManager.defaultGamePrefix !== "" ? settingsManager.defaultGamePrefix : "~/.wine"
                 }
                 QQC2.Button {
                     icon.name: "document-open"
@@ -225,6 +225,16 @@ Kirigami.Dialog {
             QQC2.CheckBox {
                 id: enableLoggingCheck
                 text: i18n("Write output to log file")
+            }
+
+            Repeater {
+                model: settingsManager.globalEnvVars
+                delegate: QQC2.Label {
+                    Kirigami.FormData.label: index === 0 ? i18n("Global Env Vars:") : ""
+                    text: modelData
+                    font.family: "monospace"
+                    opacity: 0.7
+                }
             }
         }
     }
@@ -251,14 +261,14 @@ Kirigami.Dialog {
     FolderDialog {
         id: prefixFolderDialog
         title: i18n("Select Proton Prefix Folder")
-        currentFolder: "file://" + protonScanner.homePath()
+        currentFolder: "file://" + dialog.prefixBasePath
         onAccepted: protonPrefixField.text = decodeURIComponent(selectedFolder.toString().replace("file://", ""))
     }
 
     FolderDialog {
         id: winePrefixFolderDialog
         title: i18n("Select Wine Prefix Folder")
-        currentFolder: "file://" + protonScanner.homePath()
+        currentFolder: "file://" + dialog.prefixBasePath
         onAccepted: winePrefixField.text = decodeURIComponent(selectedFolder.toString().replace("file://", ""))
     }
 }

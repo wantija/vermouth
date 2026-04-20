@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(vermouth VERSION 1.3.2 LANGUAGES CXX)
+project(vermouth VERSION 1.3.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -89,6 +89,8 @@ target_compile_definitions(vermouth PRIVATE
     APP_COPYRIGHT="${APP_COPYRIGHT}"
     APP_ID="${APP_ID}"
 )
+
+ki18n_install(po)
 
 install(TARGETS vermouth ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES assets/${APP_ID}.desktop DESTINATION ${KDE_INSTALL_APPDIR})

@@ -204,6 +204,32 @@ To create desktop shortcuts for your games, add `xdg-desktop` to filesystem perm
 
 Games are stored in `~/.config/vermouth/apps.json`. When umu-launcher is available, Proton is launched through it with `PROTONPATH` and `STEAM_COMPAT_DATA_PATH` set. Without umu, Vermouth calls the `proton run` script directly, the same way Steam does. Wine games get `WINEPREFIX` set and the binary called directly.
 
+## Contributing
+
+Contributions are welcome. Please open a pull request on [GitHub](https://github.com/dekomote/vermouth).
+
+### Code
+
+Build from source (see [Building from source](#building-from-source)), make your changes, and open a pull request. Keep changes focused - one feature or fix per PR.
+
+### Translations
+
+Vermouth uses the KDE i18n system (gettext `.po` files). To add or update a translation:
+
+1. Create a folder `po/<language_code>/` (e.g. `po/fr/` for French, `po/pt_BR/` for Brazilian Portuguese).
+2. Copy `po/vermouth.pot` into it as `vermouth.po` (e.g. `po/fr/vermouth.po`).
+3. Fill in the `msgstr` fields with your translations.
+4. Open a pull request with your new folder.
+
+To update an existing translation after new strings have been added:
+
+```bash
+sh po/Messages.sh       # regenerate vermouth.pot from source
+sh po/update-po.sh      # merge new strings into all .po files
+```
+
+Then fill in any new empty `msgstr ""` entries in your `.po` file.
+
 ## AI Disclaimer
 
 The code has been developed, reviewed and tested by a human. However, development included assistance of AI tools, so keep that in mind.

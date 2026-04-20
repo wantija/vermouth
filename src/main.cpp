@@ -141,6 +141,15 @@ int main(int argc, char *argv[])
     QObject::connect(&settingsManager, &SettingsManager::umuPathChanged, [&]() {
         launcher.setUmuPath(settingsManager.umuPath());
     });
+
+    launcher.setGlobalEnvVars(settingsManager.globalEnvVars());
+    QObject::connect(&settingsManager, &SettingsManager::globalEnvVarsChanged, [&]() {
+        launcher.setGlobalEnvVars(settingsManager.globalEnvVars());
+    });
+
+    QObject::connect(&app, &QApplication::aboutToQuit, [&]() {
+        launcher.restoreHdrState();
+    });
     QObject::connect(&umuDownloader, &UmuDownloader::finished, [&](const QString &binPath) {
         settingsManager.setUmuPath(binPath);
     });

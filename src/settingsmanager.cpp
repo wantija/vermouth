@@ -18,6 +18,19 @@ void SettingsManager::setDefaultPrefixDir(const QString &path)
     Q_EMIT defaultPrefixDirChanged();
 }
 
+QString SettingsManager::defaultGamePrefix() const
+{
+    return m_settings.value(QStringLiteral("defaultGamePrefix")).toString();
+}
+
+void SettingsManager::setDefaultGamePrefix(const QString &path)
+{
+    if (defaultGamePrefix() == path)
+        return;
+    m_settings.setValue(QStringLiteral("defaultGamePrefix"), path);
+    Q_EMIT defaultGamePrefixChanged();
+}
+
 QStringList SettingsManager::extraProtonPaths() const
 {
     return m_settings.value(QStringLiteral("extraProtonPaths")).toStringList();
@@ -97,6 +110,17 @@ void SettingsManager::setUmuPath(const QString &path)
         return;
     m_settings.setValue(QStringLiteral("umuPath"), path);
     Q_EMIT umuPathChanged();
+}
+
+QStringList SettingsManager::globalEnvVars() const
+{
+    return m_settings.value(QStringLiteral("globalEnvVars")).toStringList();
+}
+
+void SettingsManager::setGlobalEnvVars(const QStringList &vars)
+{
+    m_settings.setValue(QStringLiteral("globalEnvVars"), vars);
+    Q_EMIT globalEnvVarsChanged();
 }
 
 bool SettingsManager::drawerPinned() const

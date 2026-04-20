@@ -92,11 +92,15 @@ Kirigami.ApplicationWindow {
                 onClicked: addDialog.openForNew()
             }
             QQC2.Button {
-                icon.name: "media-playback-start"
+                property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0
+                icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
                 enabled: gridView.selectedIndex >= 0
                 onClicked: {
                     var app = appModel.getApp(gridView.selectedIndex);
-                    launcher.launchEntry(app);
+                    if (isRunning)
+                        launcher.stopEntry(app);
+                    else
+                        launcher.launchEntry(app);
                 }
             }
         }
@@ -220,6 +224,16 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    function openExe(path) {
+        var existing = appModel.getAppByExePath(path);
+        if (existing && existing.exePath !== undefined) {
+            launcher.launchEntry(existing);
+        } else {
+            openExeChoiceDialog.exePath = path;
+            openExeChoiceDialog.open();
+        }
+    }
+
     DropArea {
         anchors.fill: parent
         onDropped: function (drop) {
@@ -229,25 +243,20 @@ Kirigami.ApplicationWindow {
             } else if (drop.hasText) {
                 path = decodeURIComponent(drop.text.trim().replace("file://", ""));
             }
-            if (path !== "") {
-                openExeChoiceDialog.exePath = path;
-                openExeChoiceDialog.open();
-            }
+            if (path !== "")
+                root.openExe(path);
         }
     }
 
     Component.onCompleted: {
-        if (typeof openExePath !== "undefined" && openExePath !== "") {
-            openExeChoiceDialog.exePath = openExePath;
-            openExeChoiceDialog.open();
-        }
+        if (typeof openExePath !== "undefined" && openExePath !== "")
+            root.openExe(openExePath);
     }
 
     Connections {
         target: singleInstance
         function onOpenExeRequested(path) {
-            openExeChoiceDialog.exePath = path;
-            openExeChoiceDialog.open();
+            root.openExe(path);
         }
         function onRaiseRequested() {
             root.raise();

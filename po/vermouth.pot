@@ -1,0 +1,533 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the vermouth package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vermouth\n"
+"Report-Msgid-Bugs-To: deko@duck.com\n"
+"POT-Creation-Date: 2026-04-20 12:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: po/../src/main.cpp:27
+msgid "Vermouth"
+msgstr ""
+
+#: po/../src/main.cpp:32
+msgid "Lead Developer"
+msgstr ""
+
+#: po/../src/main.cpp:47
+msgid "Launch app by its config ID"
+msgstr ""
+
+#: po/../src/main.cpp:48
+msgid "Launch exe with Proton"
+msgstr ""
+
+#: po/../src/main.cpp:49
+msgid "Launch exe with Wine"
+msgstr ""
+
+#: po/../src/main.cpp:50
+msgid "Proton path"
+msgstr ""
+
+#: po/../src/main.cpp:51
+msgid "Wine binary path"
+msgstr ""
+
+#: po/../src/main.cpp:52
+msgid "Prefix path"
+msgstr ""
+
+#: po/../src/main.cpp:53
+#, c-format
+msgid "Launch options (use %command% as placeholder)"
+msgstr ""
+
+#: po/../src/main.cpp:54
+msgid "Enable logging to file"
+msgstr ""
+
+#: po/../src/main.cpp:64
+msgid "File or URI to open"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:9
+msgid "Edit App/Game"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:9
+msgid "Add App/Game"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:17
+msgid "OK"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:27 po/../qml/RunExeStandaloneDialog.qml:27
+msgid "Cancel"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:97
+msgid "Name is required."
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:101 po/../qml/RunExeStandaloneDialog.qml:44
+msgid "Executable path is required."
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:140
+msgid "Game"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:146
+msgid "Name:"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:147
+msgid "My Game"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:151 po/../qml/RunExeDialog.qml:37
+#: po/../qml/RunExeStandaloneDialog.qml:92
+msgid "Executable (.exe):"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:164
+msgid "Icon (optional):"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:188
+msgid "Proton Prefix (optional):"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:202
+msgid "Wine Prefix (WINEPREFIX):"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:216 po/../qml/RunExeStandaloneDialog.qml:116
+msgid "Options"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:221 po/../qml/RunExeStandaloneDialog.qml:121
+msgid "Launch Options (optional):"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:222
+msgid "e.g. mangohud %command%"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:227
+msgid "Write output to log file"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:233
+msgid "Global Env Vars:"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:244 po/../qml/RunExeDialog.qml:53
+#: po/../qml/RunExeStandaloneDialog.qml:129
+msgid "Select Executable"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:246 po/../qml/RunExeDialog.qml:55
+#: po/../qml/RunExeStandaloneDialog.qml:131
+msgid "Executables (*.exe)"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:246 po/../qml/AddAppDialog.qml:257
+#: po/../qml/RunExeDialog.qml:55 po/../qml/RunExeStandaloneDialog.qml:131
+msgid "All files (*)"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:255
+msgid "Select Icon"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:257
+msgid "Images (*.png *.svg *.ico *.jpg)"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:263
+msgid "Select Proton Prefix Folder"
+msgstr ""
+
+#: po/../qml/AddAppDialog.qml:270
+msgid "Select Wine Prefix Folder"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:226
+msgid "Stop"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:226
+msgid "Launch"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:240
+msgid "Launch with logging"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:253
+msgid "Run another EXE in this prefix"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:262
+msgid "Create start menu entry"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:270
+msgid "Create desktop shortcut"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:278
+msgid "&Wine Utilities"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:282
+msgid "Run Winecfg"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:290
+msgid "Run Regedit"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:298
+msgid "Run Winetricks"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:312
+msgid "Open log folder"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:317
+msgid "Open prefix folder"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:328
+msgid "Edit"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:333
+msgid "Remove"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:341
+msgid "Remove and Delete Prefix"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:354
+msgid "Delete both app and prefix?"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:355
+msgid "This will delete both the app and the prefix?"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:363
+msgid "Delete the app?"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:364
+msgid "This will delete the app but preserve the prefix folder."
+msgstr ""
+
+#: po/../qml/AppGridView.qml:371
+msgid "Winetricks not found"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:372
+msgid ""
+"Winetricks is not installed on your system. Please install it using your "
+"package manager."
+msgstr ""
+
+#: po/../qml/AppGridView.qml:380
+msgid "No apps or games added yet"
+msgstr ""
+
+#: po/../qml/AppGridView.qml:381
+msgid "Click \"Add App/Game\" to get started"
+msgstr ""
+
+#: po/../qml/Main.qml:28
+msgid "Unpin sidebar"
+msgstr ""
+
+#: po/../qml/Main.qml:28
+msgid "Pin sidebar"
+msgstr ""
+
+#: po/../qml/Main.qml:36 po/../qml/Main.qml:90
+msgid "Add &App/Game"
+msgstr ""
+
+#: po/../qml/Main.qml:41
+msgid "Run &Standalone EXE"
+msgstr ""
+
+#: po/../qml/Main.qml:46 po/../qml/Main.qml:132
+msgid "Allow Sleep"
+msgstr ""
+
+#: po/../qml/Main.qml:46 po/../qml/Main.qml:132
+msgid "Prevent Sleep"
+msgstr ""
+
+#: po/../qml/Main.qml:53 po/../qml/Main.qml:142
+msgid "Disable HDR"
+msgstr ""
+
+#: po/../qml/Main.qml:53 po/../qml/Main.qml:142
+msgid "Enable HDR"
+msgstr ""
+
+#: po/../qml/Main.qml:61
+msgid "&Settings"
+msgstr ""
+
+#: po/../qml/Main.qml:66
+msgid "&About Vermouth"
+msgstr ""
+
+#: po/../qml/Main.qml:71
+msgid "Quit"
+msgstr ""
+
+#: po/../qml/Main.qml:122
+msgid "%1 - %2"
+msgstr ""
+
+#: po/../qml/Main.qml:185
+msgid "Open Executable"
+msgstr ""
+
+#: po/../qml/Main.qml:190
+msgid "Run Standalone"
+msgstr ""
+
+#: po/../qml/Main.qml:198
+msgid "Add to Library"
+msgstr ""
+
+#: po/../qml/Main.qml:215
+msgid "Prefix not ready"
+msgstr ""
+
+#: po/../qml/Main.qml:216
+msgid ""
+"The prefix for \"%1\" has not been created yet. Please launch the game at "
+"least once first."
+msgstr ""
+
+#: po/../qml/Main.qml:270
+msgid "Launched: %1"
+msgstr ""
+
+#: po/../qml/Main.qml:273
+msgid "Error: %1"
+msgstr ""
+
+#: po/../qml/RunExeDialog.qml:9
+msgid "Run EXE in Prefix"
+msgstr ""
+
+#: po/../qml/RunExeDialog.qml:29
+msgid "Run an executable using the same prefix as \"%1\""
+msgstr ""
+
+#: po/../qml/RunExeStandaloneDialog.qml:9
+msgid "Run Standalone EXE"
+msgstr ""
+
+#: po/../qml/RunExeStandaloneDialog.qml:17
+msgid "Run"
+msgstr ""
+
+#: po/../qml/RunExeStandaloneDialog.qml:122
+msgid "e.g ENV_VAR1=2"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:14
+msgid "Runtime"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:64
+msgid "Please select a Proton version."
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:67
+msgid "Wine binary path is required."
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:106
+msgid "Runtime:"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:112
+msgid "Proton Version:"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:118 po/../qml/RuntimePicker.qml:120
+msgid ""
+"No Proton versions found. Download GE Proton to get started - no Steam or "
+"manual setup needed."
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:125
+msgid "Open Vermouth Proton folder (%1)"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:131
+msgid "Refresh Proton versions"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:138 po/../qml/SettingsDialog.qml:184
+msgid "Download latest GE Proton"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:145
+msgid "Wine Binary:"
+msgstr ""
+
+#: po/../qml/RuntimePicker.qml:160
+msgid "Select Wine Binary"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:9
+msgid "Settings"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:66
+msgid "Default Runtime"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:74
+msgid "umu-launcher"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:79
+msgid ""
+"umu-launcher runs Proton through the Steam Runtime (pressure-vessel), which "
+"significantly improves game compatibility - especially for games with video "
+"cutscenes or anti-cheat. Strongly recommended."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:88
+msgid "umu-run path:"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:92
+msgid "Auto-detect (umu-run in PATH)"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:102
+msgid "Download latest umu-launcher"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:116
+msgid "Prefixes"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:120
+msgid "Default Prefix Parent Folder:"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:134
+msgid ""
+"This is the folder where Vermouth stores all the created prefixes by default."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:143
+msgid "Default App/Game Prefix:"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:147
+msgid "Auto-generate per app/game"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:157
+msgid ""
+"Set this if you want all apps and games to share a single prefix (e.g. one "
+"Wine/Proton environment for everything). Leave empty to auto-generate a "
+"separate prefix per game. You can still use separate prefixe per game, but "
+"you have to set it explicitly."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:167
+msgid "Vermouth Proton Folder"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:171
+msgid ""
+"Download GE Proton to run most games and apps - no Steam or manual setup "
+"needed."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:174
+msgid "Open Vermouth Proton folder"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:180
+msgid "Download Latest GE Proton"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:191
+msgid "Extra Proton Scan Paths"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:195
+msgid ""
+"Folders to scan for Proton installations (in addition to Steam and local "
+"paths)."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:217
+msgid "Add Path..."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:225
+msgid "Global Environment Variables"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:229
+msgid "Applied to every game. Per-game launch options can override these."
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:237
+msgid "KEY"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:246
+msgid "value"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:259
+msgid "Add Variable"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:272
+msgid "Select umu-run binary"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:279
+msgid "Select Default Prefix Folder"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:286
+msgid "Select Default App/Game Prefix"
+msgstr ""
+
+#: po/../qml/SettingsDialog.qml:293
+msgid "Select Proton Scan Folder"
+msgstr ""

@@ -60,6 +60,7 @@ public:
                              bool enableLogging = false);
     Q_INVOKABLE QVariantMap getApp(int index) const;
     Q_INVOKABLE QVariantMap getAppById(const QString &id) const;
+    Q_INVOKABLE QVariantMap getAppByExePath(const QString &exePath) const;
     Q_INVOKABLE void setFilterString(const QString &filter);
 
     void load();

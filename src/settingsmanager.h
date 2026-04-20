@@ -8,18 +8,23 @@ class SettingsManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString defaultPrefixDir READ defaultPrefixDir WRITE setDefaultPrefixDir NOTIFY defaultPrefixDirChanged)
+    Q_PROPERTY(QString defaultGamePrefix READ defaultGamePrefix WRITE setDefaultGamePrefix NOTIFY defaultGamePrefixChanged)
     Q_PROPERTY(QStringList extraProtonPaths READ extraProtonPaths WRITE setExtraProtonPaths NOTIFY extraProtonPathsChanged)
     Q_PROPERTY(QString defaultRuntimeType READ defaultRuntimeType WRITE setDefaultRuntimeType NOTIFY defaultRuntimeChanged)
     Q_PROPERTY(QString defaultProtonPath READ defaultProtonPath WRITE setDefaultProtonPath NOTIFY defaultRuntimeChanged)
     Q_PROPERTY(QString defaultWineBinary READ defaultWineBinary WRITE setDefaultWineBinary NOTIFY defaultRuntimeChanged)
     Q_PROPERTY(bool drawerPinned READ drawerPinned WRITE setDrawerPinned NOTIFY drawerPinnedChanged)
     Q_PROPERTY(QString umuPath READ umuPath WRITE setUmuPath NOTIFY umuPathChanged)
+    Q_PROPERTY(QStringList globalEnvVars READ globalEnvVars WRITE setGlobalEnvVars NOTIFY globalEnvVarsChanged)
 
 public:
     explicit SettingsManager(QObject *parent = nullptr);
 
     QString defaultPrefixDir() const;
     Q_INVOKABLE void setDefaultPrefixDir(const QString &path);
+
+    QString defaultGamePrefix() const;
+    Q_INVOKABLE void setDefaultGamePrefix(const QString &path);
 
     QStringList extraProtonPaths() const;
     void setExtraProtonPaths(const QStringList &paths);
@@ -42,12 +47,17 @@ public:
     QString umuPath() const;
     Q_INVOKABLE void setUmuPath(const QString &path);
 
+    QStringList globalEnvVars() const;
+    Q_INVOKABLE void setGlobalEnvVars(const QStringList &vars);
+
 Q_SIGNALS:
     void defaultPrefixDirChanged();
+    void defaultGamePrefixChanged();
     void extraProtonPathsChanged();
     void defaultRuntimeChanged();
     void drawerPinnedChanged();
     void umuPathChanged();
+    void globalEnvVarsChanged();
 
 private:
     QSettings m_settings;

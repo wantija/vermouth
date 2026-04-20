@@ -61,6 +61,11 @@ void Launcher::setUmuPath(const QString &path)
     m_umuPath = path;
 }
 
+void Launcher::setGlobalEnvVars(const QStringList &vars)
+{
+    m_globalEnvVars = vars;
+}
+
 QString Launcher::logDir() const
 {
     return m_logDir;
@@ -82,8 +87,14 @@ void Launcher::launch(const QString &binary,
                       const QString &logName)
 {
     auto *proc = new QProcess(this);
-    connect(proc, &QProcess::finished, proc, &QProcess::deleteLater);
-    connect(proc, &QProcess::finished, this, &Launcher::processFinished);
+    m_runningProcesses.insert(exePath, proc);
+    Q_EMIT runningExePathsChanged();
+    connect(proc, &QProcess::finished, this, [this, exePath, proc](int exitCode) {
+        m_runningProcesses.remove(exePath);
+        Q_EMIT runningExePathsChanged();
+        Q_EMIT processFinished(exitCode);
+        proc->deleteLater();
+    });
 
     proc->setProcessEnvironment(env);
     proc->setWorkingDirectory(QFileInfo(exePath).absolutePath());
@@ -111,6 +122,8 @@ void Launcher::launch(const QString &binary,
     }
 
     if (!proc->waitForStarted(5000)) {
+        m_runningProcesses.remove(exePath);
+        Q_EMIT runningExePathsChanged();
         Q_EMIT launchError(exePath, proc->errorString());
         proc->deleteLater();
     } else {
@@ -126,6 +139,12 @@ void Launcher::launchEntry(const QVariantMap &app)
     QString name = app[QStringLiteral("name")].toString();
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    for (const QString &kv : std::as_const(m_globalEnvVars)) {
+        int sep = kv.indexOf(QLatin1Char('='));
+        if (sep > 0)
+            env.insert(kv.left(sep), kv.mid(sep + 1));
+    }
 
     if (m_hdrEnabled) {
         env.insert(QStringLiteral("PROTON_ENABLE_HDR"), QStringLiteral("1"));
@@ -161,6 +180,13 @@ void Launcher::launchEntry(const QVariantMap &app)
         }
         launch(app[QStringLiteral("wineBinary")].toString(), {}, exePath, env, opts, logging, name);
     }
+}
+
+void Launcher::stopEntry(const QVariantMap &app)
+{
+    QProcess *proc = m_runningProcesses.value(app[QStringLiteral("exePath")].toString(), nullptr);
+    if (proc)
+        proc->terminate();
 }
 
 void Launcher::runInPrefix(const QVariantMap &app, const QString &exePath)
@@ -306,7 +332,19 @@ void Launcher::toggleHdr()
     QString screenName = currentScreenName();
     QString action = enable ? QStringLiteral("hdr.enable") : QStringLiteral("hdr.disable");
     QProcess::execute(kscreenDoctorBin(), kscreenDoctorArgs({QStringLiteral("output.") + screenName + QLatin1Char('.') + action}));
+    if (enable)
+        m_hdrEnabledByUs = true;
+    else
+        m_hdrEnabledByUs = false;
     refreshHdrState();
+}
+
+void Launcher::restoreHdrState()
+{
+    if (!m_hdrEnabledByUs)
+        return;
+    QString screenName = currentScreenName();
+    QProcess::execute(kscreenDoctorBin(), kscreenDoctorArgs({QStringLiteral("output.") + screenName + QStringLiteral(".hdr.disable")}));
 }
 
 void Launcher::setupLogging(QProcess *proc, const QString &name)

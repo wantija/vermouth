@@ -13,17 +13,36 @@ Kirigami.PromptDialog {
     onAccepted: {
         settingsManager.setUmuPath(umuPathField.text);
         settingsManager.setDefaultPrefixDir(prefixDirField.text);
+        settingsManager.setDefaultGamePrefix(gamePrefixField.text);
         defaultRuntimePicker.saveToSettings();
+        var vars = [];
+        for (var i = 0; i < envModel.count; i++) {
+            var k = envModel.get(i).key.trim();
+            var v = envModel.get(i).value.trim();
+            if (k !== "")
+                vars.push(k + "=" + v);
+        }
+        settingsManager.setGlobalEnvVars(vars);
     }
 
     function openDialog() {
         umuPathField.text = settingsManager.umuPath;
         prefixDirField.text = settingsManager.defaultPrefixDir;
+        gamePrefixField.text = settingsManager.defaultGamePrefix;
         pathsModel.clear();
         var paths = settingsManager.extraProtonPaths;
         for (var i = 0; i < paths.length; i++) {
             pathsModel.append({
                 "path": paths[i]
+            });
+        }
+        envModel.clear();
+        var vars = settingsManager.globalEnvVars;
+        for (var j = 0; j < vars.length; j++) {
+            var sep = vars[j].indexOf("=");
+            envModel.append({
+                "key": sep > 0 ? vars[j].substring(0, sep) : vars[j],
+                "value": sep > 0 ? vars[j].substring(sep + 1) : ""
             });
         }
         defaultRuntimePicker.reset();
@@ -32,6 +51,10 @@ Kirigami.PromptDialog {
 
     ListModel {
         id: pathsModel
+    }
+
+    ListModel {
+        id: envModel
     }
 
     ColumnLayout {
@@ -94,7 +117,7 @@ Kirigami.PromptDialog {
             }
 
             RowLayout {
-                Kirigami.FormData.label: i18n("Default Prefix Folder:")
+                Kirigami.FormData.label: i18n("Default Prefix Parent Folder:")
                 QQC2.TextField {
                     id: prefixDirField
                     Layout.fillWidth: true
@@ -104,6 +127,39 @@ Kirigami.PromptDialog {
                     icon.name: "document-open"
                     onClicked: prefixDirFolderDialog.open()
                 }
+            }
+
+            QQC2.Label {
+                Kirigami.FormData.label: ""
+                text: i18n("This is the folder where Vermouth stores all the created prefixes by default.")
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 26
+                font.italic: true
+                opacity: 0.8
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: i18n("Default App/Game Prefix:")
+                QQC2.TextField {
+                    id: gamePrefixField
+                    Layout.fillWidth: true
+                    placeholderText: i18n("Auto-generate per app/game")
+                }
+                QQC2.Button {
+                    icon.name: "document-open"
+                    onClicked: gamePrefixFolderDialog.open()
+                }
+            }
+
+            QQC2.Label {
+                Kirigami.FormData.label: ""
+                text: i18n("Set this if you want all apps and games to share a single prefix (e.g. one Wine/Proton environment for everything). Leave empty to auto-generate a separate prefix per game. You can still use separate prefixe per game, but you have to set it explicitly.")
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 26
+                font.italic: true
+                opacity: 0.8
             }
 
             Kirigami.Separator {
@@ -163,6 +219,51 @@ Kirigami.PromptDialog {
                     onClicked: protonPathFolderDialog.open()
                 }
             }
+
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("Global Environment Variables")
+            }
+
+            ColumnLayout {
+                Kirigami.FormData.label: i18n("Applied to every game. Per-game launch options can override these.")
+                Layout.fillWidth: true
+
+                Repeater {
+                    model: envModel
+                    delegate: RowLayout {
+                        Layout.fillWidth: true
+                        QQC2.TextField {
+                            placeholderText: i18n("KEY")
+                            text: model.key
+                            implicitWidth: Kirigami.Units.gridUnit * 9
+                            onTextChanged: envModel.setProperty(index, "key", text)
+                        }
+                        QQC2.Label {
+                            text: "="
+                        }
+                        QQC2.TextField {
+                            placeholderText: i18n("value")
+                            text: model.value
+                            Layout.fillWidth: true
+                            onTextChanged: envModel.setProperty(index, "value", text)
+                        }
+                        QQC2.Button {
+                            icon.name: "list-remove"
+                            onClicked: envModel.remove(index)
+                        }
+                    }
+                }
+
+                QQC2.Button {
+                    text: i18n("Add Variable")
+                    icon.name: "list-add"
+                    onClicked: envModel.append({
+                        "key": "",
+                        "value": ""
+                    })
+                }
+            }
         }
     }
 
@@ -178,6 +279,13 @@ Kirigami.PromptDialog {
         title: i18n("Select Default Prefix Folder")
         currentFolder: "file://" + protonScanner.homePath()
         onAccepted: prefixDirField.text = decodeURIComponent(selectedFolder.toString().replace("file://", ""))
+    }
+
+    FolderDialog {
+        id: gamePrefixFolderDialog
+        title: i18n("Select Default App/Game Prefix")
+        currentFolder: "file://" + protonScanner.prefixBasePath()
+        onAccepted: gamePrefixField.text = decodeURIComponent(selectedFolder.toString().replace("file://", ""))
     }
 
     FolderDialog {
