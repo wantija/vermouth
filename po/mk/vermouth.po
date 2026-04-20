@@ -1,0 +1,550 @@
+# Vermouth in Macedonian.
+# Copyright (C) 2026 DEJAN NOVESKI
+# This file is distributed under the same license as the PACKAGE package.
+# DEJAN NOVESKI <DEKO@DUCK.COM>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.3.3\n"
+"Report-Msgid-Bugs-To: deko@duck.com\n"
+"POT-Creation-Date: 2026-04-20 12:28+0200\n"
+"PO-Revision-Date: 2026-04-20 11:37+0200\n"
+"Last-Translator: DEJAN NOVESKI <DEKO@DUCK.COM>\n"
+"Language-Team: Macedonian\n"
+"Language: mk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
+
+#: po/../src/main.cpp:27
+msgid "Vermouth"
+msgstr "Vermouth"
+
+#: po/../src/main.cpp:32
+msgid "Lead Developer"
+msgstr "Главен програмер"
+
+#: po/../src/main.cpp:47
+msgid "Launch app by its config ID"
+msgstr "Стартувaj апликација по нејзиниот конфигурациски ID"
+
+#: po/../src/main.cpp:48
+msgid "Launch exe with Proton"
+msgstr "Стартувaj exe со Proton"
+
+#: po/../src/main.cpp:49
+msgid "Launch exe with Wine"
+msgstr "Стартуваj exe со Wine"
+
+#: po/../src/main.cpp:50
+msgid "Proton path"
+msgstr "Патека до Proton"
+
+#: po/../src/main.cpp:51
+msgid "Wine binary path"
+msgstr "Патека до Wine бинарна датотека"
+
+#: po/../src/main.cpp:52
+msgid "Prefix path"
+msgstr "Патека до префикс"
+
+#: po/../src/main.cpp:53
+#, c-format
+msgid "Launch options (use %command% as placeholder)"
+msgstr "Опции за стартување (користете %command% како замена)"
+
+#: po/../src/main.cpp:54
+msgid "Enable logging to file"
+msgstr "Овозможи запишување во датотека"
+
+#: po/../src/main.cpp:64
+msgid "File or URI to open"
+msgstr "Датотека или URI за отворање"
+
+#: po/../qml/AddAppDialog.qml:9
+msgid "Edit App/Game"
+msgstr "Уреди апликација/игра"
+
+#: po/../qml/AddAppDialog.qml:9
+msgid "Add App/Game"
+msgstr "Додади апликација/игра"
+
+#: po/../qml/AddAppDialog.qml:17
+msgid "OK"
+msgstr "Во ред"
+
+#: po/../qml/AddAppDialog.qml:27 po/../qml/RunExeStandaloneDialog.qml:27
+msgid "Cancel"
+msgstr "Откажи"
+
+#: po/../qml/AddAppDialog.qml:97
+msgid "Name is required."
+msgstr "Името е задолжително."
+
+#: po/../qml/AddAppDialog.qml:101 po/../qml/RunExeStandaloneDialog.qml:44
+msgid "Executable path is required."
+msgstr "Патеката до извршната датотека е задолжителна."
+
+#: po/../qml/AddAppDialog.qml:140
+msgid "Game"
+msgstr "Игра"
+
+#: po/../qml/AddAppDialog.qml:146
+msgid "Name:"
+msgstr "Име:"
+
+#: po/../qml/AddAppDialog.qml:147
+msgid "My Game"
+msgstr "Моја игра"
+
+#: po/../qml/AddAppDialog.qml:151 po/../qml/RunExeDialog.qml:37
+#: po/../qml/RunExeStandaloneDialog.qml:92
+msgid "Executable (.exe):"
+msgstr "Извршна датотека (.exe):"
+
+#: po/../qml/AddAppDialog.qml:164
+msgid "Icon (optional):"
+msgstr "Икона (незадолжително):"
+
+#: po/../qml/AddAppDialog.qml:188
+msgid "Proton Prefix (optional):"
+msgstr "Протон Префикс (незадолжително):"
+
+#: po/../qml/AddAppDialog.qml:202
+msgid "Wine Prefix (WINEPREFIX):"
+msgstr "Wine Префикс (WINEPREFIX):"
+
+#: po/../qml/AddAppDialog.qml:216 po/../qml/RunExeStandaloneDialog.qml:116
+msgid "Options"
+msgstr "Опции"
+
+#: po/../qml/AddAppDialog.qml:221 po/../qml/RunExeStandaloneDialog.qml:121
+msgid "Launch Options (optional):"
+msgstr "Опции за стартување (незадолжително):"
+
+#: po/../qml/AddAppDialog.qml:222
+msgid "e.g. mangohud %command%"
+msgstr "пр. mangohud %command%"
+
+#: po/../qml/AddAppDialog.qml:227
+msgid "Write output to log file"
+msgstr "Запиши излез во датотека за дневник"
+
+#: po/../qml/AddAppDialog.qml:233
+msgid "Global Env Vars:"
+msgstr "Глобални env променливи:"
+
+#: po/../qml/AddAppDialog.qml:244 po/../qml/RunExeDialog.qml:53
+#: po/../qml/RunExeStandaloneDialog.qml:129
+msgid "Select Executable"
+msgstr "Изберете извршна датотека"
+
+#: po/../qml/AddAppDialog.qml:246 po/../qml/RunExeDialog.qml:55
+#: po/../qml/RunExeStandaloneDialog.qml:131
+msgid "Executables (*.exe)"
+msgstr "Извршни датотеки (*.exe)"
+
+#: po/../qml/AddAppDialog.qml:246 po/../qml/AddAppDialog.qml:257
+#: po/../qml/RunExeDialog.qml:55 po/../qml/RunExeStandaloneDialog.qml:131
+msgid "All files (*)"
+msgstr "Сите датотеки (*)"
+
+#: po/../qml/AddAppDialog.qml:255
+msgid "Select Icon"
+msgstr "Изберете икона"
+
+#: po/../qml/AddAppDialog.qml:257
+msgid "Images (*.png *.svg *.ico *.jpg)"
+msgstr "Слики (*.png *.svg *.ico *.jpg)"
+
+#: po/../qml/AddAppDialog.qml:263
+msgid "Select Proton Prefix Folder"
+msgstr "Изберете папка за Proton Префикс"
+
+#: po/../qml/AddAppDialog.qml:270
+msgid "Select Wine Prefix Folder"
+msgstr "Изберете папка за Wine Префикс"
+
+#: po/../qml/AppGridView.qml:226
+msgid "Stop"
+msgstr "Запри"
+
+#: po/../qml/AppGridView.qml:226
+msgid "Launch"
+msgstr "Стартувај"
+
+#: po/../qml/AppGridView.qml:240
+msgid "Launch with logging"
+msgstr "Стартувај со запишување"
+
+#: po/../qml/AppGridView.qml:253
+msgid "Run another EXE in this prefix"
+msgstr "Стартувај друг EXE во овој префикс"
+
+#: po/../qml/AppGridView.qml:262
+msgid "Create start menu entry"
+msgstr "Создај ставка во стартното мени"
+
+#: po/../qml/AppGridView.qml:270
+msgid "Create desktop shortcut"
+msgstr "Создај кратенка на работната површина"
+
+#: po/../qml/AppGridView.qml:278
+msgid "&Wine Utilities"
+msgstr "&Wine алатки"
+
+#: po/../qml/AppGridView.qml:282
+msgid "Run Winecfg"
+msgstr "Стартувај Winecfg"
+
+#: po/../qml/AppGridView.qml:290
+msgid "Run Regedit"
+msgstr "Стартувај Regedit"
+
+#: po/../qml/AppGridView.qml:298
+msgid "Run Winetricks"
+msgstr "Стартувај Winetricks"
+
+#: po/../qml/AppGridView.qml:312
+msgid "Open log folder"
+msgstr "Отвори папка за дневник"
+
+#: po/../qml/AppGridView.qml:317
+msgid "Open prefix folder"
+msgstr "Отвори папка за prefix"
+
+#: po/../qml/AppGridView.qml:328
+msgid "Edit"
+msgstr "Уреди"
+
+#: po/../qml/AppGridView.qml:333
+msgid "Remove"
+msgstr "Отстрани"
+
+#: po/../qml/AppGridView.qml:341
+msgid "Remove and Delete Prefix"
+msgstr "Отстрани и избриши префикс"
+
+#: po/../qml/AppGridView.qml:354
+msgid "Delete both app and prefix?"
+msgstr "Да се избришат и апликацијата и prefix-от?"
+
+#: po/../qml/AppGridView.qml:355
+msgid "This will delete both the app and the prefix?"
+msgstr "Ова ќе ги избрише и апликацијата и префиксот."
+
+#: po/../qml/AppGridView.qml:363
+msgid "Delete the app?"
+msgstr "Да се избрише апликацијата?"
+
+#: po/../qml/AppGridView.qml:364
+msgid "This will delete the app but preserve the prefix folder."
+msgstr "Ова ќе ја избрише апликацијата, но ќе ја зачува папката со префиксот."
+
+#: po/../qml/AppGridView.qml:371
+msgid "Winetricks not found"
+msgstr "Winetricks не е пронајден"
+
+#: po/../qml/AppGridView.qml:372
+msgid ""
+"Winetricks is not installed on your system. Please install it using your "
+"package manager."
+msgstr ""
+"Winetricks не е инсталиран на вашиот систем. Инсталирајте го преку вашиот "
+"менаџер на пакети."
+
+#: po/../qml/AppGridView.qml:380
+msgid "No apps or games added yet"
+msgstr "Сè уште нема додадено апликации или игри"
+
+#: po/../qml/AppGridView.qml:381
+msgid "Click \"Add App/Game\" to get started"
+msgstr "Кликнете „Додади апликација/игра“ за да започнете"
+
+#: po/../qml/Main.qml:28
+msgid "Unpin sidebar"
+msgstr "Откачи странична лента"
+
+#: po/../qml/Main.qml:28
+msgid "Pin sidebar"
+msgstr "Закачи странична лента"
+
+#: po/../qml/Main.qml:36 po/../qml/Main.qml:90
+msgid "Add &App/Game"
+msgstr "Додади &апликација/игра"
+
+#: po/../qml/Main.qml:41
+msgid "Run &Standalone EXE"
+msgstr "Стартување на &самостоен EXE"
+
+#: po/../qml/Main.qml:46 po/../qml/Main.qml:132
+msgid "Allow Sleep"
+msgstr "Дозволи спиење"
+
+#: po/../qml/Main.qml:46 po/../qml/Main.qml:132
+msgid "Prevent Sleep"
+msgstr "Спречи спиење"
+
+#: po/../qml/Main.qml:53 po/../qml/Main.qml:142
+msgid "Disable HDR"
+msgstr "Оневозможи HDR"
+
+#: po/../qml/Main.qml:53 po/../qml/Main.qml:142
+msgid "Enable HDR"
+msgstr "Овозможи HDR"
+
+#: po/../qml/Main.qml:61
+msgid "&Settings"
+msgstr "&Поставки"
+
+#: po/../qml/Main.qml:66
+msgid "&About Vermouth"
+msgstr "&За Vermouth"
+
+#: po/../qml/Main.qml:71
+msgid "Quit"
+msgstr "Излез"
+
+#: po/../qml/Main.qml:122
+msgid "%1 - %2"
+msgstr "%1 — %2"
+
+#: po/../qml/Main.qml:185
+msgid "Open Executable"
+msgstr "Отвори извршна датотека"
+
+#: po/../qml/Main.qml:190
+msgid "Run Standalone"
+msgstr "Стартување самостојно"
+
+#: po/../qml/Main.qml:198
+msgid "Add to Library"
+msgstr "Додади во библиотека"
+
+#: po/../qml/Main.qml:215
+msgid "Prefix not ready"
+msgstr "Prefix не е подготвен"
+
+#: po/../qml/Main.qml:216
+msgid ""
+"The prefix for \"%1\" has not been created yet. Please launch the game at "
+"least once first."
+msgstr ""
+"Префикс за \"%1\" сè уште не е создаден. Ве молиме стартувајте ја играта "
+"барем еднаш прво."
+
+#: po/../qml/Main.qml:270
+msgid "Launched: %1"
+msgstr "Стартувано: %1"
+
+#: po/../qml/Main.qml:273
+msgid "Error: %1"
+msgstr "Грешка: %1"
+
+#: po/../qml/RunExeDialog.qml:9
+msgid "Run EXE in Prefix"
+msgstr "Стартување на EXE во префикс"
+
+#: po/../qml/RunExeDialog.qml:29
+msgid "Run an executable using the same prefix as \"%1\""
+msgstr "Стартување на извршна датотека со истиот префикс како \"%1\""
+
+#: po/../qml/RunExeStandaloneDialog.qml:9
+msgid "Run Standalone EXE"
+msgstr "Стартување на самостоен EXE"
+
+#: po/../qml/RunExeStandaloneDialog.qml:17
+msgid "Run"
+msgstr "Стартувај"
+
+#: po/../qml/RunExeStandaloneDialog.qml:122
+msgid "e.g ENV_VAR1=2"
+msgstr "пр. ENV_VAR1=2"
+
+#: po/../qml/RuntimePicker.qml:14
+msgid "Runtime"
+msgstr "Извршно опкружување"
+
+#: po/../qml/RuntimePicker.qml:64
+msgid "Please select a Proton version."
+msgstr "Изберете верзија на Proton."
+
+#: po/../qml/RuntimePicker.qml:67
+msgid "Wine binary path is required."
+msgstr "Патеката до Wine бинарна датотека е задолжителна."
+
+#: po/../qml/RuntimePicker.qml:106
+msgid "Runtime:"
+msgstr "Извршно опкружување:"
+
+#: po/../qml/RuntimePicker.qml:112
+msgid "Proton Version:"
+msgstr "Верзија на Proton:"
+
+#: po/../qml/RuntimePicker.qml:118 po/../qml/RuntimePicker.qml:120
+msgid ""
+"No Proton versions found. Download GE Proton to get started - no Steam or "
+"manual setup needed."
+msgstr ""
+"Не се пронајдени верзии на Proton. Преземете GE Proton за да започнете - не "
+"е потребен Steam или рачно поставување."
+
+#: po/../qml/RuntimePicker.qml:125
+msgid "Open Vermouth Proton folder (%1)"
+msgstr "Отвори папка за Vermouth Proton (%1)"
+
+#: po/../qml/RuntimePicker.qml:131
+msgid "Refresh Proton versions"
+msgstr "Освежи листа на верзии на Proton"
+
+#: po/../qml/RuntimePicker.qml:138 po/../qml/SettingsDialog.qml:184
+msgid "Download latest GE Proton"
+msgstr "Преземи ја најновата GE Proton"
+
+#: po/../qml/RuntimePicker.qml:145
+msgid "Wine Binary:"
+msgstr "Wine бинарна датотека:"
+
+#: po/../qml/RuntimePicker.qml:160
+msgid "Select Wine Binary"
+msgstr "Изберете Wine бинарна датотека"
+
+#: po/../qml/SettingsDialog.qml:9
+msgid "Settings"
+msgstr "Поставки"
+
+#: po/../qml/SettingsDialog.qml:66
+msgid "Default Runtime"
+msgstr "Стандардно извршно опкружување"
+
+#: po/../qml/SettingsDialog.qml:74
+msgid "umu-launcher"
+msgstr "umu-launcher"
+
+#: po/../qml/SettingsDialog.qml:79
+msgid ""
+"umu-launcher runs Proton through the Steam Runtime (pressure-vessel), which "
+"significantly improves game compatibility - especially for games with video "
+"cutscenes or anti-cheat. Strongly recommended."
+msgstr ""
+"umu-launcher го извршува Proton преку Steam Runtime (pressure-vessel), што "
+"значително ја подобрува компатибилноста на игрите — особено за игри со видео-"
+"сцени или анти-чит. Силно препорачано."
+
+#: po/../qml/SettingsDialog.qml:88
+msgid "umu-run path:"
+msgstr "Патека до umu-run:"
+
+#: po/../qml/SettingsDialog.qml:92
+msgid "Auto-detect (umu-run in PATH)"
+msgstr "Автоматско откривање (umu-run во PATH)"
+
+#: po/../qml/SettingsDialog.qml:102
+msgid "Download latest umu-launcher"
+msgstr "Преземи ја најновата umu-launcher"
+
+#: po/../qml/SettingsDialog.qml:116
+msgid "Prefixes"
+msgstr "Префикси"
+
+#: po/../qml/SettingsDialog.qml:120
+msgid "Default Prefix Parent Folder:"
+msgstr "Стандардна папка за префикси:"
+
+#: po/../qml/SettingsDialog.qml:134
+msgid ""
+"This is the folder where Vermouth stores all the created prefixes by default."
+msgstr ""
+"Ова е папката каде Vermouth ги складира сите создадени префикси стандардно."
+
+#: po/../qml/SettingsDialog.qml:143
+msgid "Default App/Game Prefix:"
+msgstr "Стандарден префикс за апликација/игра:"
+
+#: po/../qml/SettingsDialog.qml:147
+msgid "Auto-generate per app/game"
+msgstr "Автоматско генерирање за секоја апликација/игра"
+
+#: po/../qml/SettingsDialog.qml:157
+msgid ""
+"Set this if you want all apps and games to share a single prefix (e.g. one "
+"Wine/Proton environment for everything). Leave empty to auto-generate a "
+"separate prefix per game. You can still use separate prefixe per game, but "
+"you have to set it explicitly."
+msgstr ""
+"Поставете го ова ако сакате сите апликации и игри да споделуваат еден префикс "
+"(пр. едно Wine/Proton опкружување за сè). Оставете празно за автоматско "
+"генерирање на посебен префикс за секоја игра. Сепак може да користите посебен "
+"префикс по игра, но мора да го поставите рачно."
+
+#: po/../qml/SettingsDialog.qml:167
+msgid "Vermouth Proton Folder"
+msgstr "Папка за Vermouth Proton"
+
+#: po/../qml/SettingsDialog.qml:171
+msgid ""
+"Download GE Proton to run most games and apps - no Steam or manual setup "
+"needed."
+msgstr ""
+"Преземете GE Proton за да стартувате повеќето игри и апликации - не е "
+"потребен Steam или рачно поставување."
+
+#: po/../qml/SettingsDialog.qml:174
+msgid "Open Vermouth Proton folder"
+msgstr "Отвори папка за Vermouth Proton"
+
+#: po/../qml/SettingsDialog.qml:180
+msgid "Download Latest GE Proton"
+msgstr "Преземи ја најновата GE Proton"
+
+#: po/../qml/SettingsDialog.qml:191
+msgid "Extra Proton Scan Paths"
+msgstr "Дополнителни патеки за скенирање на Proton"
+
+#: po/../qml/SettingsDialog.qml:195
+msgid ""
+"Folders to scan for Proton installations (in addition to Steam and local "
+"paths)."
+msgstr ""
+"Папки за скенирање на Proton инсталации (покрај Steam и локалните патеки)."
+
+#: po/../qml/SettingsDialog.qml:217
+msgid "Add Path..."
+msgstr "Додади патека..."
+
+#: po/../qml/SettingsDialog.qml:225
+msgid "Global Environment Variables"
+msgstr "Глобални променливи на опкружувањето"
+
+#: po/../qml/SettingsDialog.qml:229
+msgid "Applied to every game. Per-game launch options can override these."
+msgstr "Се применуваат на секоја игра. Опциите за секоја игра можат да ги заменат."
+
+#: po/../qml/SettingsDialog.qml:237
+msgid "KEY"
+msgstr "КЛУЧ"
+
+#: po/../qml/SettingsDialog.qml:246
+msgid "value"
+msgstr "вредност"
+
+#: po/../qml/SettingsDialog.qml:259
+msgid "Add Variable"
+msgstr "Додади променлива"
+
+#: po/../qml/SettingsDialog.qml:272
+msgid "Select umu-run binary"
+msgstr "Изберете umu-run бинарна датотека"
+
+#: po/../qml/SettingsDialog.qml:279
+msgid "Select Default Prefix Folder"
+msgstr "Изберете стандардна папка за prefix"
+
+#: po/../qml/SettingsDialog.qml:286
+msgid "Select Default App/Game Prefix"
+msgstr "Изберете стандарден prefix за апликација/игра"
+
+#: po/../qml/SettingsDialog.qml:293
+msgid "Select Proton Scan Folder"
+msgstr "Изберете папка за скенирање на Proton"
