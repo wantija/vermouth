@@ -1,5 +1,5 @@
 Name:           vermouth
-Version:        1.3.3
+Version:        1.3.4
 Release:        1%{?dist}
 Summary:        A no-frills Wine/Proton game launcher for KDE
 License:        MIT
@@ -70,6 +70,8 @@ lets you run Windows executables through Proton or Wine on KDE.
 %{_datadir}/locale/*/LC_MESSAGES/vermouth.mo
 
 %changelog
+* Tue Apr 21 2026 Dejan Noveski <deko@duck.com> - 1.3.4-1
+- Single prefix fix, HDR Enable fix for full gamut monitors
 * Mon Apr 20 2026 Dejan Noveski <deko@duck.com> - 1.3.3-1
 - Single prefix support, known exe launch, Stop button, HDR disable, translations
 * Fri Apr 17 2026 Dejan Noveski <deko@duck.com> - 1.3.2-1
