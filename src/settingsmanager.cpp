@@ -161,3 +161,16 @@ void SettingsManager::setDrawerPinned(bool pinned)
     m_settings.setValue(QStringLiteral("drawerPinned"), pinned);
     Q_EMIT drawerPinnedChanged();
 }
+
+bool SettingsManager::bigPicture() const
+{
+    return m_settings.value(QStringLiteral("bigPicture"), false).toBool();
+}
+
+void SettingsManager::setBigPicture(bool enabled)
+{
+    if (bigPicture() == enabled)
+        return;
+    m_settings.setValue(QStringLiteral("bigPicture"), enabled);
+    Q_EMIT bigPictureChanged();
+}

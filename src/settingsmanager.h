@@ -18,6 +18,7 @@ class SettingsManager : public QObject
     Q_PROPERTY(QStringList globalEnvVars READ globalEnvVars WRITE setGlobalEnvVars NOTIFY globalEnvVarsChanged)
     Q_PROPERTY(bool lightsOut READ lightsOut WRITE setLightsOut NOTIFY lightsOutChanged)
     Q_PROPERTY(QString lightsOutColor READ lightsOutColor WRITE setLightsOutColor NOTIFY lightsOutColorChanged)
+    Q_PROPERTY(bool bigPicture READ bigPicture WRITE setBigPicture NOTIFY bigPictureChanged)
 
 public:
     explicit SettingsManager(QObject *parent = nullptr);
@@ -58,6 +59,9 @@ public:
     QString lightsOutColor() const;
     Q_INVOKABLE void setLightsOutColor(const QString &color);
 
+    bool bigPicture() const;
+    Q_INVOKABLE void setBigPicture(bool enabled);
+
 Q_SIGNALS:
     void defaultPrefixDirChanged();
     void defaultGamePrefixChanged();
@@ -68,6 +72,7 @@ Q_SIGNALS:
     void globalEnvVarsChanged();
     void lightsOutChanged();
     void lightsOutColorChanged();
+    void bigPictureChanged();
 
 private:
     QSettings m_settings;

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
+import QtQuick.Window
 import org.kde.kirigami as Kirigami
 import com.dekomote.vermouth 1.0
 
@@ -10,9 +11,11 @@ Kirigami.ApplicationWindow {
     height: 800
     minimumWidth: settingsManager.drawerPinned ? 900 : 700
     minimumHeight: 800
+    visibility: settingsManager.bigPicture ? Window.FullScreen : Window.Windowed
 
     // Lights Out computed colors
     readonly property bool lightsOut: settingsManager.lightsOut
+    readonly property bool bigPicture: settingsManager.bigPicture
     readonly property color loBase: Qt.color(settingsManager.lightsOutColor)
     readonly property color loDark: Qt.darker(loBase, 1.5)
     readonly property color loDarkest: Qt.darker(loBase, 2)
@@ -21,6 +24,8 @@ Kirigami.ApplicationWindow {
     readonly property color loText: "#ffffff"
     readonly property color loSubText: Qt.rgba(1, 1, 1, 0.6)
     readonly property color loAltBg: Qt.darker(loBase, 1.3)
+    property double prevScaleFactor: 1
+    property bool prevLightsOut: false
 
     background: Rectangle {
         color: root.lightsOut ? "transparent" : Kirigami.Theme.backgroundColor
@@ -33,22 +38,6 @@ Kirigami.ApplicationWindow {
         handle.visible: false
         background: Rectangle {
             color: root.lightsOut ? root.loBase : Kirigami.Theme.backgroundColor
-        }
-
-        footer: RowLayout {
-            Item {
-                Layout.fillWidth: true
-            }
-            QQC2.ToolButton {
-                icon.name: "pin"
-                checkable: true
-                checked: settingsManager.drawerPinned
-                flat: true
-                onClicked: settingsManager.setDrawerPinned(!settingsManager.drawerPinned)
-                QQC2.ToolTip.text: settingsManager.drawerPinned ? i18n("Unpin sidebar") : i18n("Pin sidebar")
-                QQC2.ToolTip.visible: hovered
-                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
-            }
         }
 
         actions: [
@@ -80,9 +69,26 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: root.lightsOut ? i18n("Lights On") : i18n("Lights Out")
                 icon.name: root.lightsOut ? "weather-clear" : "weather-clear-night"
-                // check?able: true
-                // checked: root.lightsOut
                 onTriggered: settingsManager.setLightsOut(!root.lightsOut)
+            },
+            Kirigami.Action {
+                text: root.bigPicture ? i18n("Exit Big Picture") : i18n("Big Picture")
+                icon.name: root.bigPicture ? "view-restore" : "view-fullscreen"
+                shortcut: "F11"
+                onTriggered: {
+                    if (!root.bigPicture) {
+                        root.prevLightsOut = root.lightsOut;
+                        root.prevScaleFactor = gridView.scaleFactor;
+                        root.visibility = Window.FullScreen;
+                        settingsManager.setLightsOut(true);
+                        gridView.scaleFactor = 1.5;
+                    } else {
+                        root.visibility = Window.Windowed;
+                        settingsManager.setLightsOut(root.prevLightsOut);
+                        gridView.scaleFactor = root.prevScaleFactor;
+                    }
+                    settingsManager.setBigPicture(!root.bigPicture);
+                }
             },
             Kirigami.Action {
                 text: i18n("&Settings")
@@ -101,10 +107,25 @@ Kirigami.ApplicationWindow {
                 onTriggered: Qt.quit()
             }
         ]
+
+        footer: RowLayout {
+            Item {
+                Layout.fillWidth: true
+            }
+            QQC2.ToolButton {
+                icon.name: "pin"
+                checkable: true
+                checked: settingsManager.drawerPinned
+                flat: true
+                onClicked: settingsManager.setDrawerPinned(!settingsManager.drawerPinned)
+                QQC2.ToolTip.text: settingsManager.drawerPinned ? i18n("Unpin sidebar") : i18n("Pin sidebar")
+                QQC2.ToolTip.visible: hovered
+                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+            }
+        }
     }
 
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
-
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
 
@@ -147,9 +168,11 @@ Kirigami.ApplicationWindow {
                     icon.name: "list-add"
                     icon.color: root.lightsOut ? root.loText : "transparent"
                     onClicked: addDialog.openForNew()
+                    visible: !root.bigPicture
                 }
                 QQC2.ToolButton {
                     property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0
+                    visible: !root.bigPicture
                     icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
                     icon.color: root.lightsOut ? root.loText : "transparent"
                     enabled: gridView.selectedIndex >= 0
