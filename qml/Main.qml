@@ -41,23 +41,10 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    // Header area background overlay — covers the title bar above the pageStack
-    Rectangle {
-        visible: root.lightsOut
-        color: root.loDark
-        x: 0
-        y: 0
-        width: root.width
-        height: root.pageStack.y
-        z: 1
-    }
-
     globalDrawer: Kirigami.GlobalDrawer {
         id: globalDrawer
         modal: !settingsManager.drawerPinned
-
-        Kirigami.Theme.inherit: !root.lightsOut
-        Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+        Kirigami.Theme.colorSet: root.lightsOut ? Kirigami.Theme.Complementary : Kirigami.Theme.Window
 
         background: Rectangle {
             color: root.lightsOut ? root.loBase : Kirigami.Theme.backgroundColor
@@ -131,6 +118,8 @@ Kirigami.ApplicationWindow {
         ]
     }
 
+    pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
+
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
 
@@ -154,29 +143,45 @@ Kirigami.ApplicationWindow {
             }
         }
 
-        titleDelegate: RowLayout {
+        header: QQC2.ToolBar {
+            // Kirigami.Theme.inherit: !root.lightsOut
+            Kirigami.Theme.colorSet: root.lightsOut ? Kirigami.Theme.Complementary : Kirigami.Theme.Window
 
-            Layout.fillWidth: true
-            Kirigami.SearchField {
-                id: searchField
-                Layout.fillWidth: true
-                onTextChanged: appModel.setFilterString(text)
+            background: Rectangle {
+                color: root.lightsOut ? "transparent" : Kirigami.Theme.backgroundColor
             }
-            QQC2.Button {
-                text: i18n("Add &App/Game")
-                icon.name: "list-add"
-                onClicked: addDialog.openForNew()
-            }
-            QQC2.Button {
-                property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0
-                icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
-                enabled: gridView.selectedIndex >= 0
-                onClicked: {
-                    var app = appModel.getApp(gridView.selectedIndex);
-                    if (isRunning)
-                        launcher.stopEntry(app);
-                    else
-                        launcher.launchEntry(app);
+
+            contentItem: RowLayout {
+                spacing: Kirigami.Units.smallSpacing
+
+                QQC2.ToolButton {
+                    icon.name: "application-menu"
+                    visible: globalDrawer.modal
+                    onClicked: globalDrawer.open()
+                    icon.color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
+                }
+
+                Kirigami.SearchField {
+                    id: searchField
+                    Layout.fillWidth: true
+                    onTextChanged: appModel.setFilterString(text)
+                }
+                QQC2.Button {
+                    text: i18n("Add &App/Game")
+                    icon.name: "list-add"
+                    onClicked: addDialog.openForNew()
+                }
+                QQC2.Button {
+                    property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0
+                    icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
+                    enabled: gridView.selectedIndex >= 0
+                    onClicked: {
+                        var app = appModel.getApp(gridView.selectedIndex);
+                        if (isRunning)
+                            launcher.stopEntry(app);
+                        else
+                            launcher.launchEntry(app);
+                    }
                 }
             }
         }
