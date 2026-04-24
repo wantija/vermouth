@@ -152,9 +152,16 @@ Kirigami.ApplicationWindow {
                     icon.color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
                 }
 
+                Item {
+                    Layout.fillWidth: root.bigPicture
+                    visible: root.bigPicture
+                }
+
                 Kirigami.SearchField {
                     id: searchField
-                    Layout.fillWidth: true
+                    Layout.fillWidth: !root.bigPicture
+                    Layout.preferredWidth: root.bigPicture ? Kirigami.Units.gridUnit * 28 : -1
+                    font.pixelSize: root.bigPicture ? Math.round(Kirigami.Theme.defaultFont.pixelSize * 1.8) : Kirigami.Theme.defaultFont.pixelSize
                     onTextChanged: appModel.setFilterString(text)
                     color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
                     background: Rectangle {
@@ -162,6 +169,11 @@ Kirigami.ApplicationWindow {
                         border.color: root.lightsOut ? root.loHighlight : Kirigami.Theme.disabledTextColor
                         radius: 4
                     }
+                }
+
+                Item {
+                    Layout.fillWidth: root.bigPicture
+                    visible: root.bigPicture
                 }
                 QQC2.ToolButton {
                     text: i18n("Add &App/Game")
