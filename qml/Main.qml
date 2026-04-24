@@ -11,9 +11,57 @@ Kirigami.ApplicationWindow {
     minimumWidth: settingsManager.drawerPinned ? 900 : 700
     minimumHeight: 800
 
+    // Lights Out computed colors
+    readonly property bool lightsOut: settingsManager.lightsOut
+    readonly property color loBase: Qt.color(settingsManager.lightsOutColor)
+    readonly property color loDark: Qt.darker(loBase, 1.5)
+    readonly property color loMid: Qt.darker(loBase, 1.2)
+    readonly property color loHighlight: Qt.lighter(loBase, 1.8)
+    readonly property color loText: "#ffffff"
+    readonly property color loSubText: Qt.rgba(1, 1, 1, 0.6)
+    readonly property color loAltBg: Qt.darker(loBase, 1.3)
+
+    background: Rectangle {
+        color: root.lightsOut ? "transparent" : Kirigami.Theme.backgroundColor
+
+        Rectangle {
+            visible: root.lightsOut
+            anchors.fill: parent
+            gradient: Gradient {
+                orientation: Gradient.Vertical
+                GradientStop {
+                    position: 0.0
+                    color: root.loMid
+                }
+                GradientStop {
+                    position: 1.0
+                    color: root.loDark
+                }
+            }
+        }
+    }
+
+    // Header area background overlay — covers the title bar above the pageStack
+    Rectangle {
+        visible: root.lightsOut
+        color: root.loDark
+        x: 0
+        y: 0
+        width: root.width
+        height: root.pageStack.y
+        z: 1
+    }
+
     globalDrawer: Kirigami.GlobalDrawer {
         id: globalDrawer
         modal: !settingsManager.drawerPinned
+
+        Kirigami.Theme.inherit: !root.lightsOut
+        Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+
+        background: Rectangle {
+            color: root.lightsOut ? root.loBase : Kirigami.Theme.backgroundColor
+        }
 
         footer: RowLayout {
             Item {
@@ -58,6 +106,13 @@ Kirigami.ApplicationWindow {
                 onTriggered: launcher.toggleHdr()
             },
             Kirigami.Action {
+                text: root.lightsOut ? i18n("Lights On") : i18n("Lights Out")
+                icon.name: root.lightsOut ? "weather-clear" : "weather-clear-night"
+                // check?able: true
+                // checked: root.lightsOut
+                onTriggered: settingsManager.setLightsOut(!root.lightsOut)
+            },
+            Kirigami.Action {
                 text: i18n("&Settings")
                 icon.name: "configure"
                 onTriggered: settingsDialog.openDialog()
@@ -79,7 +134,28 @@ Kirigami.ApplicationWindow {
     pageStack.initialPage: Kirigami.ScrollablePage {
         id: mainPage
 
+        background: Rectangle {
+            color: root.lightsOut ? "transparent" : Kirigami.Theme.backgroundColor
+
+            Rectangle {
+                visible: root.lightsOut
+                anchors.fill: parent
+                gradient: Gradient {
+                    orientation: Gradient.Vertical
+                    GradientStop {
+                        position: 0.0
+                        color: root.loMid
+                    }
+                    GradientStop {
+                        position: 1.0
+                        color: root.loDark
+                    }
+                }
+            }
+        }
+
         titleDelegate: RowLayout {
+
             Layout.fillWidth: true
             Kirigami.SearchField {
                 id: searchField
@@ -108,10 +184,19 @@ Kirigami.ApplicationWindow {
         AppGridView {
             id: gridView
             anchors.fill: parent
+            lightsOut: root.lightsOut
         }
 
         footer: QQC2.ToolBar {
+            Kirigami.Theme.inherit: !root.lightsOut
+            Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+
             position: QQC2.ToolBar.Footer
+
+            background: Rectangle {
+                color: root.lightsOut ? root.loDark : Kirigami.Theme.backgroundColor
+            }
+
             contentItem: RowLayout {
                 QQC2.Label {
                     text: {
@@ -121,6 +206,7 @@ Kirigami.ApplicationWindow {
                         var runner = app.runtimeType === "proton" ? app.protonPath.split("/").pop() : app.wineBinary;
                         return i18n("%1 - %2", runner, app.exePath);
                     }
+                    color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
                     elide: Text.ElideMiddle
                     Layout.fillWidth: true
                 }
@@ -148,6 +234,7 @@ Kirigami.ApplicationWindow {
                     flat: true
                     enabled: gridView.scaleFactor > 0.5
                     onClicked: gridView.scaleFactor = Math.max(0.5, gridView.scaleFactor - 0.25)
+                    icon.color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
                 }
                 QQC2.Slider {
                     from: 0.5
@@ -162,6 +249,7 @@ Kirigami.ApplicationWindow {
                     flat: true
                     enabled: gridView.scaleFactor < 2.0
                     onClicked: gridView.scaleFactor = Math.min(2.0, gridView.scaleFactor + 0.25)
+                    icon.color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
                 }
             }
         }

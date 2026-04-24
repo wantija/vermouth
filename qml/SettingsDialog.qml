@@ -71,6 +71,49 @@ Kirigami.PromptDialog {
 
             Kirigami.Separator {
                 Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("Appearance")
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: i18n("Lights Out:")
+                QQC2.Switch {
+                    checked: settingsManager.lightsOut
+                    onToggled: settingsManager.setLightsOut(checked)
+                }
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: i18n("Background Color:")
+                opacity: settingsManager.lightsOut ? 1.0 : 0.5
+
+                Rectangle {
+                    width: Kirigami.Units.gridUnit * 4
+                    height: Kirigami.Units.gridUnit * 1.5
+                    color: settingsManager.lightsOutColor
+                    radius: Kirigami.Units.cornerRadius
+                    border.color: Kirigami.Theme.disabledTextColor
+                    border.width: 1
+
+                    MouseArea {
+                        anchors.fill: parent
+                        enabled: settingsManager.lightsOut
+                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        onClicked: {
+                            lightsOutColorDialog.selectedColor = settingsManager.lightsOutColor;
+                            lightsOutColorDialog.open();
+                        }
+                    }
+                }
+
+                QQC2.Button {
+                    text: i18n("Reset")
+                    enabled: settingsManager.lightsOut
+                    onClicked: settingsManager.setLightsOutColor("#0d1b3e")
+                }
+            }
+
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
                 Kirigami.FormData.label: i18n("umu-launcher")
             }
 
@@ -298,6 +341,17 @@ Kirigami.PromptDialog {
             pathsModel.append({
                 "path": path
             });
+        }
+    }
+
+    ColorDialog {
+        id: lightsOutColorDialog
+        title: i18n("Select Background Color")
+        onAccepted: {
+            var r = Math.round(selectedColor.r * 255);
+            var g = Math.round(selectedColor.g * 255);
+            var b = Math.round(selectedColor.b * 255);
+            settingsManager.setLightsOutColor("#" + r.toString(16).padStart(2, "0") + g.toString(16).padStart(2, "0") + b.toString(16).padStart(2, "0"));
         }
     }
 }
