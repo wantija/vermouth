@@ -8,6 +8,7 @@ GridView {
     id: gridView
     model: appModel
     property real scaleFactor: 1.0
+    property bool lightsOut: false
 
     Settings {
         id: viewSettings
@@ -81,7 +82,8 @@ GridView {
             anchors.fill: parent
             anchors.margins: Kirigami.Units.smallSpacing
             radius: Kirigami.Units.cornerRadius
-            color: Kirigami.Theme.backgroundColor
+            //color: gridView.lightsOut ? Kirigami.Theme.alternateBackgroundColor : "white"
+            color: "transparent"
             border.color: delegateRoot.isSelected ? Kirigami.Theme.highlightColor : mouseArea.containsMouse ? Qt.darker(Kirigami.Theme.highlightColor, 1.5) : "transparent"
             border.width: delegateRoot.isSelected ? 2 : mouseArea.containsMouse ? 1 : 0
 
@@ -152,7 +154,8 @@ GridView {
                     Layout.preferredWidth: 80 * gridView.scaleFactor
                     Layout.preferredHeight: 80 * gridView.scaleFactor
                     radius: Kirigami.Units.cornerRadius
-                    color: delegateRoot.iconPath === "" ? Kirigami.Theme.alternateBackgroundColor : Kirigami.Theme.backgroundColor
+                    //color: delegateRoot.iconPath === "" ? Kirigami.Theme.alternateBackgroundColor : (gridView.lightsOut ? Kirigami.Theme.backgroundColor : Qt.rgba(0.95, 0.95, 0.95, 1))
+                    color: "transparent"
 
                     Image {
                         anchors.centerIn: parent
@@ -176,6 +179,7 @@ GridView {
 
                 QQC2.Label {
                     text: delegateRoot.name
+                    color: gridView.lightsOut ? "#ffffff" : Kirigami.Theme.textColor
                     font.pixelSize: 12 * gridView.scaleFactor
                     font.bold: true
                     elide: Text.ElideRight

@@ -16,6 +16,9 @@ class SettingsManager : public QObject
     Q_PROPERTY(bool drawerPinned READ drawerPinned WRITE setDrawerPinned NOTIFY drawerPinnedChanged)
     Q_PROPERTY(QString umuPath READ umuPath WRITE setUmuPath NOTIFY umuPathChanged)
     Q_PROPERTY(QStringList globalEnvVars READ globalEnvVars WRITE setGlobalEnvVars NOTIFY globalEnvVarsChanged)
+    Q_PROPERTY(bool lightsOut READ lightsOut WRITE setLightsOut NOTIFY lightsOutChanged)
+    Q_PROPERTY(QString lightsOutColor READ lightsOutColor WRITE setLightsOutColor NOTIFY lightsOutColorChanged)
+    Q_PROPERTY(bool bigPicture READ bigPicture WRITE setBigPicture NOTIFY bigPictureChanged)
 
 public:
     explicit SettingsManager(QObject *parent = nullptr);
@@ -50,6 +53,15 @@ public:
     QStringList globalEnvVars() const;
     Q_INVOKABLE void setGlobalEnvVars(const QStringList &vars);
 
+    bool lightsOut() const;
+    Q_INVOKABLE void setLightsOut(bool enabled);
+
+    QString lightsOutColor() const;
+    Q_INVOKABLE void setLightsOutColor(const QString &color);
+
+    bool bigPicture() const;
+    Q_INVOKABLE void setBigPicture(bool enabled);
+
 Q_SIGNALS:
     void defaultPrefixDirChanged();
     void defaultGamePrefixChanged();
@@ -58,6 +70,9 @@ Q_SIGNALS:
     void drawerPinnedChanged();
     void umuPathChanged();
     void globalEnvVarsChanged();
+    void lightsOutChanged();
+    void lightsOutColorChanged();
+    void bigPictureChanged();
 
 private:
     QSettings m_settings;

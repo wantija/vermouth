@@ -123,6 +123,32 @@ void SettingsManager::setGlobalEnvVars(const QStringList &vars)
     Q_EMIT globalEnvVarsChanged();
 }
 
+bool SettingsManager::lightsOut() const
+{
+    return m_settings.value(QStringLiteral("lightsOut"), false).toBool();
+}
+
+void SettingsManager::setLightsOut(bool enabled)
+{
+    if (lightsOut() == enabled)
+        return;
+    m_settings.setValue(QStringLiteral("lightsOut"), enabled);
+    Q_EMIT lightsOutChanged();
+}
+
+QString SettingsManager::lightsOutColor() const
+{
+    return m_settings.value(QStringLiteral("lightsOutColor"), QStringLiteral("#0d1b3e")).toString();
+}
+
+void SettingsManager::setLightsOutColor(const QString &color)
+{
+    if (lightsOutColor() == color)
+        return;
+    m_settings.setValue(QStringLiteral("lightsOutColor"), color);
+    Q_EMIT lightsOutColorChanged();
+}
+
 bool SettingsManager::drawerPinned() const
 {
     return m_settings.value(QStringLiteral("drawerPinned"), false).toBool();
@@ -134,4 +160,17 @@ void SettingsManager::setDrawerPinned(bool pinned)
         return;
     m_settings.setValue(QStringLiteral("drawerPinned"), pinned);
     Q_EMIT drawerPinnedChanged();
+}
+
+bool SettingsManager::bigPicture() const
+{
+    return m_settings.value(QStringLiteral("bigPicture"), false).toBool();
+}
+
+void SettingsManager::setBigPicture(bool enabled)
+{
+    if (bigPicture() == enabled)
+        return;
+    m_settings.setValue(QStringLiteral("bigPicture"), enabled);
+    Q_EMIT bigPictureChanged();
 }
