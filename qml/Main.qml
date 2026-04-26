@@ -206,13 +206,13 @@ Kirigami.ApplicationWindow {
                     }
                 }
                 QQC2.ToolButton {
-                    property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0
+                    property bool isRunning: gridView.currentIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.currentIndex).exePath) >= 0
                     visible: !root.bigPicture
                     icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
                     icon.color: root.lightsOut ? root.loText : "transparent"
-                    enabled: gridView.selectedIndex >= 0
+                    enabled: gridView.currentIndex >= 0
                     onClicked: {
-                        var app = appModel.getApp(gridView.selectedIndex);
+                        var app = appModel.getApp(gridView.currentIndex);
                         if (isRunning)
                             launcher.stopEntry(app);
                         else
@@ -241,9 +241,9 @@ Kirigami.ApplicationWindow {
             contentItem: RowLayout {
                 QQC2.Label {
                     text: {
-                        if (gridView.selectedIndex < 0)
+                        if (gridView.currentIndex < 0)
                             return "";
-                        var app = appModel.getApp(gridView.selectedIndex);
+                        var app = appModel.getApp(gridView.currentIndex);
                         var runner;
                         if (app.runtimeType === "proton")
                             runner = app.protonPath.split("/").pop();
@@ -438,7 +438,6 @@ Kirigami.ApplicationWindow {
             if (globalDrawer.drawerOpen)
                 globalDrawer.close();
             searchField.forceActiveFocus();
-            gridView.selectedIndex = -1;
             gridView.currentIndex = -1;
             Qt.inputMethod.show();
         }

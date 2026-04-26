@@ -21,40 +21,35 @@ GridView {
     focus: true
     keyNavigationEnabled: true
 
-    property int selectedIndex: currentIndex
-
-    onCurrentIndexChanged: selectedIndex = currentIndex
-
     TapHandler {
         onTapped: {
             gridView.currentIndex = -1;
-            gridView.selectedIndex = -1;
         }
     }
 
     Shortcut {
         sequence: "Return"
-        enabled: gridView.selectedIndex >= 0
+        enabled: gridView.currentIndex >= 0
         onActivated: {
-            var app = appModel.getApp(gridView.selectedIndex);
+            var app = appModel.getApp(gridView.currentIndex);
             launcher.launchEntry(app);
         }
     }
     Shortcut {
         sequence: "Delete"
-        enabled: gridView.selectedIndex >= 0
+        enabled: gridView.currentIndex >= 0
         onActivated: {
-            var app = appModel.getApp(gridView.selectedIndex);
+            var app = appModel.getApp(gridView.currentIndex);
             confirmDeleteAppDialog.runtimeType = app.runtimeType;
-            confirmDeleteAppDialog.payload = gridView.selectedIndex;
+            confirmDeleteAppDialog.payload = gridView.currentIndex;
             confirmDeleteAppDialog.open();
         }
     }
     Shortcut {
         sequence: "Shift+Delete"
-        enabled: gridView.selectedIndex >= 0 && appModel.getApp(gridView.selectedIndex).runtimeType !== "native"
+        enabled: gridView.currentIndex >= 0 && appModel.getApp(gridView.currentIndex).runtimeType !== "native"
         onActivated: {
-            confirmDeleteDialog.payload = gridView.selectedIndex;
+            confirmDeleteDialog.payload = gridView.currentIndex;
             confirmDeleteDialog.open();
         }
     }

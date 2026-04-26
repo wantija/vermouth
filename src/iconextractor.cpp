@@ -107,9 +107,7 @@ QString IconExtractor::tryWrestool(const QString &exePath, const QString &outPat
     QString listOutput = QString::fromUtf8(icotoolProc.readAllStandardOutput());
     int bestSize = 0;
     int bestIndex = 1;
-    int currentIndex = 0;
     for (const auto &line : listOutput.split(QLatin1Char('\n'))) {
-        currentIndex++;
         QRegularExpression rx(QStringLiteral("--width=(\\d+)"));
         auto match = rx.match(line);
         if (match.hasMatch()) {

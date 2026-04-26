@@ -24,7 +24,7 @@ bool DesktopFileWriter::writeDesktopFile(const QString &filePath, const QVariant
     QString vermouthBin = QCoreApplication::applicationFilePath();
     QString id = app[QStringLiteral("id")].toString();
 
-    QString exec = QStringLiteral("%1 --launch-id \"%2\"").arg(vermouthBin, id);
+    QString exec = QStringLiteral("'%1' --launch-id \"%2\"").arg(vermouthBin, id);
 
     QFile f(filePath);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
