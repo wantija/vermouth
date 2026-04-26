@@ -154,6 +154,14 @@ Kirigami.PromptDialog {
                 }
             }
 
+            Connections {
+                target: umuDownloader
+                function onFinished(binPath) {
+                    if (umuPathField.text === "")
+                        umuPathField.text = binPath;
+                }
+            }
+
             Kirigami.Separator {
                 Kirigami.FormData.isSection: true
                 Kirigami.FormData.label: i18n("Prefixes")

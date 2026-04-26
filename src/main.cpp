@@ -175,7 +175,8 @@ int main(int argc, char *argv[])
         launcher.restoreHdrState();
     });
     QObject::connect(&umuDownloader, &UmuDownloader::finished, [&](const QString &binPath) {
-        settingsManager.setUmuPath(binPath);
+        if (settingsManager.umuPath().isEmpty())
+            settingsManager.setUmuPath(binPath);
     });
 
     protonScanner.setExtraProtonPaths(settingsManager.extraProtonPaths());
