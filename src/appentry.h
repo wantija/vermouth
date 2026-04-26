@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QUuid>
+#include <QVariantMap>
 
 class AppEntry
 {
@@ -31,5 +32,6 @@ public:
     bool enableLogging = false;
 
     QJsonObject toJson() const;
+    QVariantMap toVariantMap() const;
     static AppEntry fromJson(const QJsonObject &obj);
 };

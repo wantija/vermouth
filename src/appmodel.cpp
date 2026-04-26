@@ -209,22 +209,7 @@ QVariantMap AppModel::getApp(int index) const
         return {};
 
     const auto &e = m_entries[src];
-    return {
-        {QStringLiteral("id"), e.id},
-        {QStringLiteral("name"), e.name},
-        {QStringLiteral("exePath"), e.exePath},
-        {QStringLiteral("runtimeType"),
-         e.runtimeType == AppEntry::Proton       ? QStringLiteral("proton")
-             : e.runtimeType == AppEntry::Native ? QStringLiteral("native")
-                                                 : QStringLiteral("wine")},
-        {QStringLiteral("protonPath"), e.protonPath},
-        {QStringLiteral("protonPrefix"), e.protonPrefix},
-        {QStringLiteral("wineBinary"), e.wineBinary},
-        {QStringLiteral("winePrefix"), e.winePrefix},
-        {QStringLiteral("iconPath"), e.iconPath},
-        {QStringLiteral("launchOptions"), e.launchOptions},
-        {QStringLiteral("enableLogging"), e.enableLogging},
-    };
+    return e.toVariantMap();
 }
 
 QString AppModel::configPath() const
@@ -238,22 +223,7 @@ QVariantMap AppModel::getAppById(const QString &id) const
 {
     for (const auto &e : m_entries) {
         if (e.id == id) {
-            return {
-                {QStringLiteral("id"), e.id},
-                {QStringLiteral("name"), e.name},
-                {QStringLiteral("exePath"), e.exePath},
-                {QStringLiteral("runtimeType"),
-                 e.runtimeType == AppEntry::Proton       ? QStringLiteral("proton")
-                     : e.runtimeType == AppEntry::Native ? QStringLiteral("native")
-                                                         : QStringLiteral("wine")},
-                {QStringLiteral("protonPath"), e.protonPath},
-                {QStringLiteral("protonPrefix"), e.protonPrefix},
-                {QStringLiteral("wineBinary"), e.wineBinary},
-                {QStringLiteral("winePrefix"), e.winePrefix},
-                {QStringLiteral("iconPath"), e.iconPath},
-                {QStringLiteral("launchOptions"), e.launchOptions},
-                {QStringLiteral("enableLogging"), e.enableLogging},
-            };
+            return e.toVariantMap();
         }
     }
     return {};
@@ -263,24 +233,7 @@ QVariantMap AppModel::getAppByExePath(const QString &exePath) const
 {
     for (int i = 0; i < m_entries.size(); ++i) {
         if (m_entries[i].exePath == exePath) {
-            // Return via getApp using a filtered index isn't safe here; build map directly.
-            const auto &e = m_entries[i];
-            return {
-                {QStringLiteral("id"), e.id},
-                {QStringLiteral("name"), e.name},
-                {QStringLiteral("exePath"), e.exePath},
-                {QStringLiteral("runtimeType"),
-                 e.runtimeType == AppEntry::Proton       ? QStringLiteral("proton")
-                     : e.runtimeType == AppEntry::Native ? QStringLiteral("native")
-                                                         : QStringLiteral("wine")},
-                {QStringLiteral("protonPath"), e.protonPath},
-                {QStringLiteral("protonPrefix"), e.protonPrefix},
-                {QStringLiteral("wineBinary"), e.wineBinary},
-                {QStringLiteral("winePrefix"), e.winePrefix},
-                {QStringLiteral("iconPath"), e.iconPath},
-                {QStringLiteral("launchOptions"), e.launchOptions},
-                {QStringLiteral("enableLogging"), e.enableLogging},
-            };
+            return m_entries[i].toVariantMap();
         }
     }
     return {};

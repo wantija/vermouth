@@ -19,6 +19,26 @@ QJsonObject AppEntry::toJson() const
     return obj;
 }
 
+QVariantMap AppEntry::toVariantMap() const
+{
+    return {
+        {QStringLiteral("id"), id},
+        {QStringLiteral("name"), name},
+        {QStringLiteral("exePath"), exePath},
+        {QStringLiteral("runtimeType"),
+         runtimeType == Proton       ? QStringLiteral("proton")
+             : runtimeType == Native ? QStringLiteral("native")
+                                     : QStringLiteral("wine")},
+        {QStringLiteral("protonPath"), protonPath},
+        {QStringLiteral("protonPrefix"), protonPrefix},
+        {QStringLiteral("wineBinary"), wineBinary},
+        {QStringLiteral("winePrefix"), winePrefix},
+        {QStringLiteral("iconPath"), iconPath},
+        {QStringLiteral("launchOptions"), launchOptions},
+        {QStringLiteral("enableLogging"), enableLogging},
+    };
+}
+
 AppEntry AppEntry::fromJson(const QJsonObject &obj)
 {
     AppEntry e;
