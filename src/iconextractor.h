@@ -15,4 +15,6 @@ public:
 private:
     QString cacheDir() const;
     QString tryWrestool(const QString &exePath, const QString &outPath);
+    QString tryAppImage(const QString &exePath, const QString &outBase);
+    QString tryDesktop(const QString &exePath);
 };

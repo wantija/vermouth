@@ -62,7 +62,9 @@ QVariant AppModel::data(const QModelIndex &index, int role) const
     case ExePathRole:
         return e.exePath;
     case RuntimeTypeRole:
-        return (e.runtimeType == AppEntry::Proton) ? QStringLiteral("proton") : QStringLiteral("wine");
+        return e.runtimeType == AppEntry::Proton ? QStringLiteral("proton")
+            : e.runtimeType == AppEntry::Native  ? QStringLiteral("native")
+                                                 : QStringLiteral("wine");
     case ProtonPathRole:
         return e.protonPath;
     case ProtonPrefixRole:
@@ -113,7 +115,7 @@ void AppModel::addApp(const QString &name,
     e.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     e.name = name;
     e.exePath = exePath;
-    e.runtimeType = (runtimeType == QStringLiteral("proton")) ? AppEntry::Proton : AppEntry::Wine;
+    e.runtimeType = runtimeType == QStringLiteral("proton") ? AppEntry::Proton : runtimeType == QStringLiteral("native") ? AppEntry::Native : AppEntry::Wine;
     e.protonPath = protonPath;
     e.protonPrefix = protonPrefix;
     e.wineBinary = wineBinary;
@@ -184,7 +186,7 @@ void AppModel::editApp(int index,
     auto &e = m_entries[src];
     e.name = name;
     e.exePath = exePath;
-    e.runtimeType = (runtimeType == QStringLiteral("proton")) ? AppEntry::Proton : AppEntry::Wine;
+    e.runtimeType = runtimeType == QStringLiteral("proton") ? AppEntry::Proton : runtimeType == QStringLiteral("native") ? AppEntry::Native : AppEntry::Wine;
     e.protonPath = protonPath;
     e.protonPrefix = protonPrefix;
     e.wineBinary = wineBinary;
@@ -211,7 +213,10 @@ QVariantMap AppModel::getApp(int index) const
         {QStringLiteral("id"), e.id},
         {QStringLiteral("name"), e.name},
         {QStringLiteral("exePath"), e.exePath},
-        {QStringLiteral("runtimeType"), (e.runtimeType == AppEntry::Proton) ? QStringLiteral("proton") : QStringLiteral("wine")},
+        {QStringLiteral("runtimeType"),
+         e.runtimeType == AppEntry::Proton       ? QStringLiteral("proton")
+             : e.runtimeType == AppEntry::Native ? QStringLiteral("native")
+                                                 : QStringLiteral("wine")},
         {QStringLiteral("protonPath"), e.protonPath},
         {QStringLiteral("protonPrefix"), e.protonPrefix},
         {QStringLiteral("wineBinary"), e.wineBinary},
@@ -237,7 +242,10 @@ QVariantMap AppModel::getAppById(const QString &id) const
                 {QStringLiteral("id"), e.id},
                 {QStringLiteral("name"), e.name},
                 {QStringLiteral("exePath"), e.exePath},
-                {QStringLiteral("runtimeType"), (e.runtimeType == AppEntry::Proton) ? QStringLiteral("proton") : QStringLiteral("wine")},
+                {QStringLiteral("runtimeType"),
+                 e.runtimeType == AppEntry::Proton       ? QStringLiteral("proton")
+                     : e.runtimeType == AppEntry::Native ? QStringLiteral("native")
+                                                         : QStringLiteral("wine")},
                 {QStringLiteral("protonPath"), e.protonPath},
                 {QStringLiteral("protonPrefix"), e.protonPrefix},
                 {QStringLiteral("wineBinary"), e.wineBinary},
@@ -261,7 +269,10 @@ QVariantMap AppModel::getAppByExePath(const QString &exePath) const
                 {QStringLiteral("id"), e.id},
                 {QStringLiteral("name"), e.name},
                 {QStringLiteral("exePath"), e.exePath},
-                {QStringLiteral("runtimeType"), (e.runtimeType == AppEntry::Proton) ? QStringLiteral("proton") : QStringLiteral("wine")},
+                {QStringLiteral("runtimeType"),
+                 e.runtimeType == AppEntry::Proton       ? QStringLiteral("proton")
+                     : e.runtimeType == AppEntry::Native ? QStringLiteral("native")
+                                                         : QStringLiteral("wine")},
                 {QStringLiteral("protonPath"), e.protonPath},
                 {QStringLiteral("protonPrefix"), e.protonPrefix},
                 {QStringLiteral("wineBinary"), e.wineBinary},

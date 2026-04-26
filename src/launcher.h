@@ -60,7 +60,8 @@ private:
                 const QProcessEnvironment &env,
                 const QString &launchOptions,
                 bool enableLogging,
-                const QString &logName);
+                const QString &logName,
+                bool appendExe = true);
     void setupLogging(QProcess *proc, const QString &name);
     void refreshHdrState();
     QString m_logDir;

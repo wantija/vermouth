@@ -6,7 +6,9 @@ QJsonObject AppEntry::toJson() const
     obj[QStringLiteral("id")] = id;
     obj[QStringLiteral("name")] = name;
     obj[QStringLiteral("exePath")] = exePath;
-    obj[QStringLiteral("runtimeType")] = (runtimeType == Proton) ? QStringLiteral("proton") : QStringLiteral("wine");
+    obj[QStringLiteral("runtimeType")] = runtimeType == Proton ? QStringLiteral("proton")
+        : runtimeType == Wine                                  ? QStringLiteral("wine")
+                                                               : QStringLiteral("native");
     obj[QStringLiteral("protonPath")] = protonPath;
     obj[QStringLiteral("protonPrefix")] = protonPrefix;
     obj[QStringLiteral("wineBinary")] = wineBinary;
@@ -25,7 +27,8 @@ AppEntry AppEntry::fromJson(const QJsonObject &obj)
         e.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     e.name = obj[QStringLiteral("name")].toString();
     e.exePath = obj[QStringLiteral("exePath")].toString();
-    e.runtimeType = (obj[QStringLiteral("runtimeType")].toString() == QStringLiteral("proton")) ? Proton : Wine;
+    QString rt = obj[QStringLiteral("runtimeType")].toString();
+    e.runtimeType = rt == QStringLiteral("proton") ? Proton : rt == QStringLiteral("native") ? Native : Wine;
     e.protonPath = obj[QStringLiteral("protonPath")].toString();
     e.protonPrefix = obj[QStringLiteral("protonPrefix")].toString();
     e.wineBinary = obj[QStringLiteral("wineBinary")].toString();

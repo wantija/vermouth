@@ -161,7 +161,13 @@ GridView {
                         anchors.centerIn: parent
                         width: 70 * gridView.scaleFactor
                         height: 70 * gridView.scaleFactor
-                        source: delegateRoot.iconPath !== "" ? "file://" + delegateRoot.iconPath : ""
+                        source: {
+                            if (delegateRoot.iconPath === "")
+                                return "";
+                            if (delegateRoot.iconPath.startsWith("/"))
+                                return "file://" + delegateRoot.iconPath;
+                            return "image://icon/" + delegateRoot.iconPath;
+                        }
                         visible: delegateRoot.iconPath !== ""
                         fillMode: Image.PreserveAspectFit
                         sourceSize: Qt.size(128, 128)
@@ -254,6 +260,7 @@ GridView {
             }
             QQC2.MenuSeparator {}
             QQC2.MenuItem {
+                visible: delegateRoot.runtimeType !== "native"
                 text: i18n("Run another EXE in this prefix")
                 icon.name: "system-run"
                 onTriggered: {
@@ -261,7 +268,9 @@ GridView {
                     runExeDialog.open();
                 }
             }
-            QQC2.MenuSeparator {}
+            QQC2.MenuSeparator {
+                visible: delegateRoot.runtimeType !== "native"
+            }
             QQC2.MenuItem {
                 text: i18n("Create start menu entry")
                 icon.name: "application-menu"
@@ -279,6 +288,7 @@ GridView {
                 }
             }
             QQC2.Menu {
+                enabled: delegateRoot.runtimeType !== "native"
                 title: i18n("&Wine Utilities")
                 icon.name: "wine" // fallback icon
 
@@ -318,6 +328,7 @@ GridView {
                 onTriggered: Qt.openUrlExternally("file://" + launcher.logDir())
             }
             QQC2.MenuItem {
+                visible: delegateRoot.runtimeType !== "native"
                 text: i18n("Open prefix folder")
                 icon.name: "folder-open"
                 onTriggered: {
@@ -342,6 +353,7 @@ GridView {
                 }
             }
             QQC2.MenuItem {
+                visible: delegateRoot.runtimeType !== "native"
                 text: i18n("Remove and Delete Prefix")
                 icon.name: "edit-delete"
                 onTriggered: {

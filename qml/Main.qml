@@ -224,7 +224,13 @@ Kirigami.ApplicationWindow {
                         if (gridView.selectedIndex < 0)
                             return "";
                         var app = appModel.getApp(gridView.selectedIndex);
-                        var runner = app.runtimeType === "proton" ? app.protonPath.split("/").pop() : app.wineBinary;
+                        var runner;
+                        if (app.runtimeType === "proton")
+                            runner = app.protonPath.split("/").pop();
+                        else if (app.runtimeType === "wine")
+                            runner = app.wineBinary;
+                        else
+                            runner = "Native";
                         return i18n("%1 - %2", runner, app.exePath);
                     }
                     color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
@@ -474,7 +480,7 @@ Kirigami.ApplicationWindow {
             showPassiveNotification(i18n("Launched: %1", name), 3000);
         }
         function onLaunchError(name, error) {
-            showPassiveNotification(i18n("Error: %1", error), 5000);
+            showPassiveNotification(i18n("Error launching: %1", error), 6000);
         }
         function onPrefixNotReady(name) {
             prefixNotReadyDialog.appName = name;

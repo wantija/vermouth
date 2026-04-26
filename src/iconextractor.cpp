@@ -1,11 +1,15 @@
 #include "iconextractor.h"
 #include <QCryptographicHash>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
+#include <QIcon>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QTemporaryFile>
+#include <QTextStream>
 
 IconExtractor::IconExtractor(QObject *parent)
     : QObject(parent)
@@ -25,14 +29,31 @@ QString IconExtractor::extractIcon(const QString &exePath)
         return {};
 
     QByteArray hash = QCryptographicHash::hash(exePath.toUtf8(), QCryptographicHash::Md5).toHex();
-    QString outPath = cacheDir() + QStringLiteral("/") + QString::fromLatin1(hash) + QStringLiteral(".png");
+    QString outBase = cacheDir() + QStringLiteral("/") + QString::fromLatin1(hash);
 
-    if (QFileInfo::exists(outPath))
-        return outPath;
+    for (const char *ext : {".png", ".svg"}) {
+        if (QFileInfo::exists(outBase + QLatin1String(ext)))
+            return outBase + QLatin1String(ext);
+    }
 
-    QString result = tryWrestool(exePath, outPath);
+    QString result = tryWrestool(exePath, outBase + QStringLiteral(".png"));
     if (!result.isEmpty())
         return result;
+
+    if (exePath.endsWith(QStringLiteral(".AppImage"), Qt::CaseInsensitive) || exePath.endsWith(QStringLiteral(".appimage"), Qt::CaseInsensitive))
+        return tryAppImage(exePath, outBase);
+
+    if (exePath.endsWith(QStringLiteral(".desktop"), Qt::CaseInsensitive))
+        return tryDesktop(exePath);
+
+    // Scripts/binaries: look for an adjacent image with the same base name
+    QFileInfo fi(exePath);
+    QString base = fi.absolutePath() + QLatin1Char('/') + fi.completeBaseName();
+    for (const char *ext : {".png", ".svg", ".ico"}) {
+        QString candidate = base + QLatin1String(ext);
+        if (QFileInfo::exists(candidate))
+            return candidate;
+    }
 
     return {};
 }
@@ -95,5 +116,149 @@ QString IconExtractor::tryWrestool(const QString &exePath, const QString &outPat
 
     if (QFileInfo::exists(outPath) && QFileInfo(outPath).size() > 0)
         return outPath;
+    return {};
+}
+
+static QString parseIconFromDesktop(const QString &path)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return {};
+    bool inDesktopEntry = false;
+    QTextStream in(&f);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line == QStringLiteral("[Desktop Entry]"))
+            inDesktopEntry = true;
+        else if (line.startsWith(QLatin1Char('[')) && inDesktopEntry)
+            break;
+        else if (inDesktopEntry && line.startsWith(QStringLiteral("Icon=")))
+            return line.mid(5).trimmed();
+    }
+    return {};
+}
+
+static QString detectExt(const QString &filePath)
+{
+    QFile f(filePath);
+    if (!f.open(QIODevice::ReadOnly))
+        return QStringLiteral(".png");
+    QByteArray hdr = f.read(8);
+    if (hdr.startsWith("<?xml") || hdr.startsWith("<svg") || hdr.startsWith("\xef\xbb\xbf"))
+        return QStringLiteral(".svg");
+    return QStringLiteral(".png");
+}
+
+QString IconExtractor::tryAppImage(const QString &exePath, const QString &outBase)
+{
+    QFileInfo fi(exePath);
+    if (!fi.isExecutable())
+        QFile::setPermissions(exePath, fi.permissions() | QFileDevice::ExeOwner);
+
+    // Fast path: extract the root .desktop file and check if its icon is in the theme
+    {
+        QTemporaryDir quickTmp;
+        if (quickTmp.isValid()) {
+            QProcess proc;
+            proc.setWorkingDirectory(quickTmp.path());
+            proc.start(exePath, {QStringLiteral("--appimage-extract"), QStringLiteral("*.desktop")});
+            proc.waitForFinished(10000);
+            const auto entries = QDir(quickTmp.path() + QStringLiteral("/squashfs-root")).entryList(QStringList{QStringLiteral("*.desktop")}, QDir::Files);
+            for (const QString &df : entries) {
+                QString iconName = parseIconFromDesktop(quickTmp.path() + QStringLiteral("/squashfs-root/") + df);
+                if (!iconName.isEmpty() && QIcon::hasThemeIcon(iconName))
+                    return iconName;
+            }
+        }
+    }
+
+    QTemporaryDir tmpDir;
+    if (!tmpDir.isValid())
+        return {};
+
+    auto copyToCache = [&](const QString &srcPath) -> QString {
+        QString outPath = outBase + detectExt(srcPath);
+        return QFile::copy(srcPath, outPath) ? outPath : QString();
+    };
+
+    // Extract .DirIcon from the AppImage (uses built-in squashfs, no FUSE needed)
+    {
+        QProcess proc;
+        proc.setWorkingDirectory(tmpDir.path());
+        proc.start(exePath, {QStringLiteral("--appimage-extract"), QStringLiteral(".DirIcon")});
+        proc.waitForFinished(15000);
+
+        QString dirIcon = tmpDir.path() + QStringLiteral("/squashfs-root/.DirIcon");
+        QFileInfo difi(dirIcon);
+
+        if (difi.exists() && !difi.isSymLink())
+            return copyToCache(dirIcon);
+
+        if (difi.isSymLink()) {
+            QString absTarget = difi.symLinkTarget();
+            QString squashRoot = tmpDir.path() + QStringLiteral("/squashfs-root/");
+            if (absTarget.startsWith(squashRoot)) {
+                QString relTarget = absTarget.mid(squashRoot.length());
+                QProcess proc2;
+                proc2.setWorkingDirectory(tmpDir.path());
+                proc2.start(exePath, {QStringLiteral("--appimage-extract"), relTarget});
+                proc2.waitForFinished(15000);
+                if (QFileInfo::exists(absTarget))
+                    return copyToCache(absTarget);
+            }
+        }
+    }
+
+    // Fallback: unsquashfs with symlink following
+    QString unsquashfs = QStandardPaths::findExecutable(QStringLiteral("unsquashfs"));
+    if (!unsquashfs.isEmpty()) {
+        QTemporaryDir tmpDir2;
+        if (!tmpDir2.isValid())
+            return {};
+        QString extractDir = tmpDir2.path() + QStringLiteral("/root");
+        QProcess proc;
+        proc.start(unsquashfs,
+                   {QStringLiteral("-n"), QStringLiteral("-follow-symlinks"), QStringLiteral("-d"), extractDir, exePath, QStringLiteral(".DirIcon")});
+        proc.waitForFinished(15000);
+        QString iconPath = extractDir + QStringLiteral("/.DirIcon");
+        if (QFileInfo::exists(iconPath) && !QFileInfo(iconPath).isSymLink())
+            return copyToCache(iconPath);
+    }
+
+    return {};
+}
+
+QString IconExtractor::tryDesktop(const QString &exePath)
+{
+    QString iconName = parseIconFromDesktop(exePath);
+    if (iconName.isEmpty())
+        return {};
+
+    // Absolute path to an existing file — use directly
+    if (iconName.startsWith(QLatin1Char('/')) && QFileInfo::exists(iconName))
+        return iconName;
+
+    // Theme icon name — return it directly if the theme has it
+    if (QIcon::hasThemeIcon(iconName))
+        return iconName;
+
+    // Fallback: search common icon directories
+    const QStringList searchDirs = {
+        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/256x256/apps"),
+        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/128x128/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/256x256/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/128x128/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/64x64/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/48x48/apps"),
+        QStringLiteral("/usr/share/pixmaps"),
+    };
+    for (const QString &dir : searchDirs) {
+        for (const char *ext : {".png", ".svg", ".xpm", ""}) {
+            QString candidate = dir + QLatin1Char('/') + iconName + QLatin1String(ext);
+            if (QFileInfo::exists(candidate))
+                return candidate;
+        }
+    }
+
     return {};
 }

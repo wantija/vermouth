@@ -11,7 +11,8 @@ class AppEntry
 public:
     enum RuntimeType {
         Proton,
-        Wine
+        Wine,
+        Native
     };
 
     QString id;

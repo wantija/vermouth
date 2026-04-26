@@ -6,7 +6,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Dialog {
     id: dialog
-    title: i18n("Run Standalone EXE")
+    title: i18n("Run Standalone")
     preferredWidth: Kirigami.Units.gridUnit * 30
     padding: Kirigami.Units.largeSpacing
     bottomPadding: 30
@@ -65,10 +65,12 @@ Kirigami.Dialog {
             entry["runtimeType"] = "proton";
             entry["protonPath"] = runtimePicker.protonPath;
             entry["protonPrefix"] = defaultPrefix;
-        } else {
+        } else if (runtimePicker.runtimeType === "wine") {
             entry["runtimeType"] = "wine";
             entry["wineBinary"] = runtimePicker.wineBinary;
             entry["winePrefix"] = defaultPrefix;
+        } else {
+            entry["runtimeType"] = "native";
         }
 
         launcher.launchEntry(entry);
@@ -89,11 +91,11 @@ Kirigami.Dialog {
             twinFormLayouts: runtimePicker.formLayout
 
             RowLayout {
-                Kirigami.FormData.label: i18n("Executable (.exe):")
+                Kirigami.FormData.label: i18n("Executable:")
                 QQC2.TextField {
                     id: exeField
                     Layout.fillWidth: true
-                    placeholderText: "/path/to/game.exe"
+                    placeholderText: "/path/to/game"
                 }
                 QQC2.Button {
                     icon.name: "document-open"
@@ -128,7 +130,7 @@ Kirigami.Dialog {
         id: exeFileDialog
         title: i18n("Select Executable")
         currentFolder: "file://" + protonScanner.homePath()
-        nameFilters: [i18n("Executables (*.exe)"), i18n("All files (*)")]
+        nameFilters: runtimePicker.runtimeType === "native" ? [i18n("Binaries, scripts & AppImages (*.sh *.py *.pl *.rb *.run *.bash *.zsh *.AppImage *.appimage *.desktop)"), i18n("All files (*)")] : [i18n("Executables (*.exe)"), i18n("All files (*)")]
         onAccepted: exeField.text = decodeURIComponent(selectedFile.toString().replace("file://", ""))
     }
 }
