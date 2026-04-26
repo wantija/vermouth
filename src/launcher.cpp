@@ -89,7 +89,6 @@ void Launcher::launch(const QString &binary,
                       bool appendExe)
 {
     auto *proc = new QProcess(this);
-    proc->setProcessChannelMode(QProcess::MergedChannels);
     auto *timer = new QElapsedTimer();
     timer->start();
     m_runningProcesses.insert(exePath, proc);
@@ -216,6 +215,7 @@ void Launcher::launchEntry(const QVariantMap &app)
         QFileInfo fi(binary);
         if (!exePath.endsWith(QStringLiteral(".desktop"), Qt::CaseInsensitive) && !fi.isExecutable())
             QFile::setPermissions(binary, fi.permissions() | QFileDevice::ExeOwner | QFileDevice::ExeGroup | QFileDevice::ExeOther);
+        env.insert(QStringLiteral("APPIMAGE"), exePath);
         launch(binary, baseArgs, exePath, env, opts, logging, name, false);
     } else {
         QString prefix = app[QStringLiteral("winePrefix")].toString();

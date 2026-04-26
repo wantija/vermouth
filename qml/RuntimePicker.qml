@@ -20,6 +20,10 @@ ColumnLayout {
         loadFromSettings();
     }
 
+    function setRuntimeType(type) {
+        runtimeCombo.currentIndex = type === "proton" ? 0 : type === "wine" ? 1 : 2;
+    }
+
     function loadFromSettings() {
         var rt = settingsManager.defaultRuntimeType;
         runtimeCombo.currentIndex = rt === "wine" ? 1 : rt === "native" ? 2 : 0;

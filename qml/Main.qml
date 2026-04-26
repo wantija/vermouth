@@ -44,9 +44,14 @@ Kirigami.ApplicationWindow {
         actions: [
             Kirigami.Action {
                 id: firstDrawerAction
-                text: i18n("Add &App/Game")
+                text: i18n("Add &Windows App/Game")
                 icon.name: "list-add"
-                onTriggered: addDialog.openForNew()
+                onTriggered: addDialog.openForNewWindows()
+            },
+            Kirigami.Action {
+                text: i18n("Add &Linux App/Game")
+                icon.name: "list-add"
+                onTriggered: addDialog.openForNewLinux()
             },
             Kirigami.Action {
                 text: i18n("Run &Standalone EXE")
@@ -179,11 +184,26 @@ Kirigami.ApplicationWindow {
                     visible: root.bigPicture
                 }
                 QQC2.ToolButton {
+                    id: addBtn
                     text: i18n("Add &App/Game")
                     icon.name: "list-add"
                     icon.color: root.lightsOut ? root.loText : "transparent"
-                    onClicked: addDialog.openForNew()
                     visible: !root.bigPicture
+                    onClicked: addMenu.popup(addBtn, 0, addBtn.height)
+                }
+                QQC2.Menu {
+                    id: addMenu
+                    closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
+                    QQC2.MenuItem {
+                        text: i18n("Add Windows App/Game")
+                        icon.name: "list-add"
+                        onTriggered: addDialog.openForNewWindows()
+                    }
+                    QQC2.MenuItem {
+                        text: i18n("Add Linux App/Game")
+                        icon.name: "list-add"
+                        onTriggered: addDialog.openForNewLinux()
+                    }
                 }
                 QQC2.ToolButton {
                     property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0

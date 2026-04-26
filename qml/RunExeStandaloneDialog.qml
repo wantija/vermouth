@@ -34,6 +34,8 @@ Kirigami.Dialog {
         exeField.text = exePath || "";
         launchOptionsField.text = "";
         runtimePicker.reset();
+        if (exePath && !/\.exe$/i.test(exePath))
+            runtimePicker.setRuntimeType("native");
         dialog.open();
     }
 

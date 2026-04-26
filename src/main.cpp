@@ -16,7 +16,27 @@
 #include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickImageProvider>
 #include <QQuickStyle>
+
+class IconImageProvider : public QQuickImageProvider
+{
+public:
+    IconImageProvider()
+        : QQuickImageProvider(QQuickImageProvider::Pixmap)
+    {
+    }
+    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override
+    {
+        QIcon icon = QIcon::fromTheme(id);
+        if (icon.isNull())
+            icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
+        QPixmap pixmap = icon.pixmap(requestedSize.isValid() ? requestedSize : QSize(128, 128));
+        if (size)
+            *size = pixmap.size();
+        return pixmap;
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -168,6 +188,7 @@ int main(int argc, char *argv[])
     });
 
     QQmlApplicationEngine engine;
+    engine.addImageProvider(QStringLiteral("icon"), new IconImageProvider);
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("appModel"), &appModel);
     engine.rootContext()->setContextProperty(QStringLiteral("protonScanner"), &protonScanner);

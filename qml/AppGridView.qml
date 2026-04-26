@@ -44,13 +44,15 @@ GridView {
         sequence: "Delete"
         enabled: gridView.selectedIndex >= 0
         onActivated: {
+            var app = appModel.getApp(gridView.selectedIndex);
+            confirmDeleteAppDialog.runtimeType = app.runtimeType;
             confirmDeleteAppDialog.payload = gridView.selectedIndex;
             confirmDeleteAppDialog.open();
         }
     }
     Shortcut {
         sequence: "Shift+Delete"
-        enabled: gridView.selectedIndex >= 0
+        enabled: gridView.selectedIndex >= 0 && appModel.getApp(gridView.selectedIndex).runtimeType !== "native"
         onActivated: {
             confirmDeleteDialog.payload = gridView.selectedIndex;
             confirmDeleteDialog.open();
@@ -348,6 +350,7 @@ GridView {
                 text: i18n("Remove")
                 icon.name: "edit-delete"
                 onTriggered: {
+                    confirmDeleteAppDialog.runtimeType = delegateRoot.runtimeType;
                     confirmDeleteAppDialog.payload = delegateRoot.index;
                     confirmDeleteAppDialog.open();
                 }
@@ -376,8 +379,9 @@ GridView {
     Kirigami.PromptDialog {
         id: confirmDeleteAppDialog
         property var payload
+        property string runtimeType: ""
         title: i18n("Delete the app?")
-        subtitle: i18n("This will delete the app but preserve the prefix folder.")
+        subtitle: runtimeType === "native" ? i18n("This will delete the app from the library.") : i18n("This will delete the app but preserve the prefix folder.")
         onAccepted: appModel.removeApp(payload)
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     }

@@ -11,6 +11,11 @@
 #include <QTemporaryFile>
 #include <QTextStream>
 
+static QString parseIconFromDesktop(const QString &path);
+static QString parseExecFromDesktop(const QString &path);
+static QString resolveIconName(const QString &iconName, const QString &searchBase);
+static QString findAdjacentIcon(const QString &filePath);
+
 IconExtractor::IconExtractor(QObject *parent)
     : QObject(parent)
 {
@@ -46,13 +51,28 @@ QString IconExtractor::extractIcon(const QString &exePath)
     if (exePath.endsWith(QStringLiteral(".desktop"), Qt::CaseInsensitive))
         return tryDesktop(exePath);
 
-    // Scripts/binaries: look for an adjacent image with the same base name
+    // Scripts/binaries: look for an adjacent icon
+    QString adjacent = findAdjacentIcon(exePath);
+    if (!adjacent.isEmpty())
+        return adjacent;
+
+    // Search for a .desktop file in the same directory that references this binary
     QFileInfo fi(exePath);
-    QString base = fi.absolutePath() + QLatin1Char('/') + fi.completeBaseName();
-    for (const char *ext : {".png", ".svg", ".ico"}) {
-        QString candidate = base + QLatin1String(ext);
-        if (QFileInfo::exists(candidate))
-            return candidate;
+    const auto desktops = QDir(fi.absolutePath()).entryInfoList(QStringList{QStringLiteral("*.desktop")}, QDir::Files);
+    for (const QFileInfo &d : desktops) {
+        QString exec = parseExecFromDesktop(d.absoluteFilePath());
+        if (!exec.isEmpty()) {
+            exec.replace(QRegularExpression(QStringLiteral("\\s*%[fFuUdDnNickvm]")), QString());
+            if (exec.contains(fi.fileName()) || exec.contains(exePath)) {
+                QString resolved = resolveIconName(parseIconFromDesktop(d.absoluteFilePath()), fi.absolutePath());
+                if (!resolved.isEmpty())
+                    return resolved;
+                // Steal the .desktop's adjacent icon too
+                QString adjFromDesktop = findAdjacentIcon(d.absoluteFilePath());
+                if (!adjFromDesktop.isEmpty())
+                    return adjFromDesktop;
+            }
+        }
     }
 
     return {};
@@ -135,6 +155,94 @@ static QString parseIconFromDesktop(const QString &path)
         else if (inDesktopEntry && line.startsWith(QStringLiteral("Icon=")))
             return line.mid(5).trimmed();
     }
+    return {};
+}
+
+static QString parseExecFromDesktop(const QString &path)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return {};
+    bool inDesktopEntry = false;
+    QTextStream in(&f);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line == QStringLiteral("[Desktop Entry]"))
+            inDesktopEntry = true;
+        else if (line.startsWith(QLatin1Char('[')) && inDesktopEntry)
+            break;
+        else if (inDesktopEntry && line.startsWith(QStringLiteral("Exec=")))
+            return line.mid(5).trimmed();
+    }
+    return {};
+}
+
+static QString resolveIconName(const QString &iconName, const QString &searchBase)
+{
+    if (iconName.isEmpty())
+        return {};
+
+    // Absolute path to an existing file — use directly
+    if (iconName.startsWith(QLatin1Char('/')) && QFileInfo::exists(iconName))
+        return iconName;
+
+    // Relative to searchBase
+    if (!iconName.startsWith(QLatin1Char('/'))) {
+        for (const char *ext : {".png", ".svg", ".xpm", ".ico", ""}) {
+            QString candidate = searchBase + QLatin1Char('/') + iconName + QLatin1String(ext);
+            if (QFileInfo::exists(candidate))
+                return candidate;
+        }
+    }
+
+    // Theme icon name — use directly if the theme has it
+    if (QIcon::hasThemeIcon(iconName))
+        return iconName;
+
+    // Search common icon directories
+    const QStringList searchDirs = {
+        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/256x256/apps"),
+        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/128x128/apps"),
+        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/64x64/apps"),
+        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/48x48/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/256x256/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/128x128/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/64x64/apps"),
+        QStringLiteral("/usr/share/icons/hicolor/48x48/apps"),
+        QStringLiteral("/usr/share/pixmaps"),
+    };
+    for (const QString &dir : searchDirs) {
+        for (const char *ext : {".png", ".svg", ".xpm", ""}) {
+            QString candidate = dir + QLatin1Char('/') + iconName + QLatin1String(ext);
+            if (QFileInfo::exists(candidate))
+                return candidate;
+        }
+    }
+
+    return {};
+}
+
+static QString findAdjacentIcon(const QString &filePath)
+{
+    QFileInfo fi(filePath);
+    QString dir = fi.absolutePath();
+    QString base = dir + QLatin1Char('/') + fi.completeBaseName();
+
+    // Same basename, common image extensions
+    for (const char *ext : {".png", ".svg", ".ico", ".xpm"}) {
+        if (QFileInfo::exists(base + QLatin1String(ext)))
+            return base + QLatin1String(ext);
+    }
+
+    // Common generic icon names in the same directory
+    for (const char *name : {"icon", "app", "logo", "application"}) {
+        for (const char *ext : {".png", ".svg", ".ico"}) {
+            QString candidate = dir + QLatin1Char('/') + QLatin1String(name) + QLatin1String(ext);
+            if (QFileInfo::exists(candidate))
+                return candidate;
+        }
+    }
+
     return {};
 }
 
@@ -231,34 +339,40 @@ QString IconExtractor::tryAppImage(const QString &exePath, const QString &outBas
 QString IconExtractor::tryDesktop(const QString &exePath)
 {
     QString iconName = parseIconFromDesktop(exePath);
-    if (iconName.isEmpty())
-        return {};
+    QString desktopDir = QFileInfo(exePath).absolutePath();
 
-    // Absolute path to an existing file — use directly
-    if (iconName.startsWith(QLatin1Char('/')) && QFileInfo::exists(iconName))
-        return iconName;
+    // Resolve the Icon= key
+    QString resolved = resolveIconName(iconName, desktopDir);
+    if (!resolved.isEmpty())
+        return resolved;
 
-    // Theme icon name — return it directly if the theme has it
-    if (QIcon::hasThemeIcon(iconName))
-        return iconName;
-
-    // Fallback: search common icon directories
-    const QStringList searchDirs = {
-        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/256x256/apps"),
-        QDir::homePath() + QStringLiteral("/.local/share/icons/hicolor/128x128/apps"),
-        QStringLiteral("/usr/share/icons/hicolor/256x256/apps"),
-        QStringLiteral("/usr/share/icons/hicolor/128x128/apps"),
-        QStringLiteral("/usr/share/icons/hicolor/64x64/apps"),
-        QStringLiteral("/usr/share/icons/hicolor/48x48/apps"),
-        QStringLiteral("/usr/share/pixmaps"),
-    };
-    for (const QString &dir : searchDirs) {
-        for (const char *ext : {".png", ".svg", ".xpm", ""}) {
-            QString candidate = dir + QLatin1Char('/') + iconName + QLatin1String(ext);
-            if (QFileInfo::exists(candidate))
-                return candidate;
+    // Fallback: try to extract icon from the Exec= line's binary
+    QString exec = parseExecFromDesktop(exePath);
+    if (!exec.isEmpty()) {
+        exec.replace(QRegularExpression(QStringLiteral("\\s*%[fFuUdDnNickvm]")), QString());
+        exec.replace(QStringLiteral("%%"), QStringLiteral("%"));
+        // Try the first space-delimited token as a path
+        QString binary = exec.section(QLatin1Char(' '), 0, 0);
+        if (!binary.isEmpty() && !binary.startsWith(QLatin1Char('-'))) {
+            // Check if the executable has an adjacent icon
+            QString adjIcon = findAdjacentIcon(binary);
+            if (!adjIcon.isEmpty())
+                return adjIcon;
+            // Try wrestool on the executable (for Windows .exe)
+            QString outBase =
+                cacheDir() + QStringLiteral("/") + QString::fromLatin1(QCryptographicHash::hash(binary.toUtf8(), QCryptographicHash::Md5).toHex());
+            QString extracted = tryWrestool(binary, outBase + QStringLiteral(".png"));
+            if (!extracted.isEmpty())
+                return extracted;
+            // If the executable is an AppImage, try to extract its icon
+            if (binary.endsWith(QStringLiteral(".AppImage"), Qt::CaseInsensitive) || binary.endsWith(QStringLiteral(".appimage"), Qt::CaseInsensitive)) {
+                QString appImageIcon = tryAppImage(binary, outBase);
+                if (!appImageIcon.isEmpty())
+                    return appImageIcon;
+            }
         }
     }
 
-    return {};
+    // Last resort: adjacent images matching the .desktop filename
+    return findAdjacentIcon(exePath);
 }

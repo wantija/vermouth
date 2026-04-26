@@ -77,8 +77,19 @@ Kirigami.Dialog {
             winePrefixField.text = resolvedPrefix;
     }
 
+    function openForNewLinux() {
+        openForNew();
+        runtimePicker.setRuntimeType("native");
+    }
+
+    function openForNewWindows() {
+        openForNew();
+    }
+
     function openForNewWithExe(exePath) {
         openForNew();
+        if (!/\.exe$/i.test(exePath))
+            runtimePicker.setRuntimeType("native");
         applyExePath(exePath);
     }
 
