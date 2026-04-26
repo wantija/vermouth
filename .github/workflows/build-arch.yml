@@ -17,7 +17,7 @@ jobs:
           pacman -S --noconfirm --needed \
             base-devel cmake ninja extra-cmake-modules git nodejs \
             qt6-base qt6-declarative \
-            kirigami ki18n kcoreaddons qqc2-desktop-style
+            kirigami ki18n kcoreaddons qqc2-desktop-style sdl2
           useradd -m builder
           echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
@@ -52,8 +52,12 @@ jobs:
               'cmake'
               'ninja'
               'extra-cmake-modules'
+              'sdl2'
           )
-          optdepends=('icoutils: Windows icon extraction')
+          optdepends=(
+              'icoutils: Windows icon extraction'
+              'sdl2: gamepad support'
+          )
           source=()
           sha256sums=()
 

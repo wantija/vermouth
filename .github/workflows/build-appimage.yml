@@ -28,7 +28,7 @@ jobs:
             qml6-module-org-kde-desktop \
             qml6-module-org-kde-iconthemes \
             qml6-module-org-kde-sonnet \
-            qt6-wayland breeze
+            qt6-wayland breeze libsdl2-dev
 
       - name: Build
         run: |
