@@ -68,6 +68,7 @@ GamepadHandler::GamepadHandler(QObject *parent)
         if (pSDL_IsGameController(i) && pSDL_GameControllerOpen(i)) {
             m_connected = true;
             Q_EMIT connectedChanged();
+            break;
         }
     }
 
@@ -117,14 +118,21 @@ void GamepadHandler::pollEvents()
     while (pSDL_PollEvent(&ev)) {
         switch (ev.type) {
         case SDL_CONTROLLERDEVICEADDED:
-            pSDL_GameControllerOpen(ev.cdevice.which);
-            if (!m_connected) {
-                m_connected = true;
-                Q_EMIT connectedChanged();
+            if (pSDL_GameControllerOpen(ev.cdevice.which)) {
+                if (!m_connected) {
+                    m_connected = true;
+                    Q_EMIT connectedChanged();
+                }
             }
             break;
         case SDL_CONTROLLERDEVICEREMOVED:
-            m_connected = pSDL_NumJoysticks() > 0;
+            m_connected = false;
+            for (int i = 0; i < pSDL_NumJoysticks(); ++i) {
+                if (pSDL_IsGameController(i)) {
+                    m_connected = true;
+                    break;
+                }
+            }
             Q_EMIT connectedChanged();
             break;
         case SDL_CONTROLLERBUTTONDOWN:

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QDBusUnixFileDescriptor>
 #include <QHash>
 #include <QObject>
 #include <QProcess>
