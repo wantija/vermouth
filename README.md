@@ -16,10 +16,11 @@
 Point it at Windows executables and run them with Proton or Wine.</p>
 
 <p align="center">
-  <img src="assets/screen1.png?t=1.3" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen2.png?t=1.3" alt="Vermouth screenshot" width="400"><br>
+  <img src="assets/screen1.png?t=1.41" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen2.png?t=1.41" alt="Vermouth screenshot" width="400"><br>
   <img src="assets/screen3.png?t=1.3" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen4.png?t=1.3" alt="Vermouth screenshot" width="400">
+  <img src="assets/screen4.png?t=1.3" alt="Vermouth screenshot" width="400"><br>
+  <img src="assets/screen6.png?t=1.4" alt="Vermouth screenshot" width="800">
 </p>
 
 ## What it does
@@ -43,6 +44,8 @@ Additionally:
 - You can create start menu entries and desktop shortcuts for individual games, and they work without opening the application window
 - You can prevent the system from sleeping while a game is running
 - HDR can be toggled per-session on KDE - enabling it also sets the required Proton environment variables automatically
+- Big screen mode (beta), gamepad navigation
+- You can launch native binaries, desktop entries and appimages
 
 ### umu-launcher support
 
