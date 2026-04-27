@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QUuid>
+#include <QVariantMap>
 
 class AppEntry
 {
@@ -11,7 +12,8 @@ class AppEntry
 public:
     enum RuntimeType {
         Proton,
-        Wine
+        Wine,
+        Native
     };
 
     QString id;
@@ -30,5 +32,6 @@ public:
     bool enableLogging = false;
 
     QJsonObject toJson() const;
+    QVariantMap toVariantMap() const;
     static AppEntry fromJson(const QJsonObject &obj);
 };

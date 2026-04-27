@@ -59,7 +59,15 @@ Kirigami.Dialog {
         if (nameField.text === "") {
             var parts = path.split("/");
             var filename = parts[parts.length - 1];
-            nameField.text = filename.replace(/\.exe$/i, "");
+            if (/\.desktop$/i.test(filename))
+                nameField.text = filename.replace(/\.desktop$/i, "");
+            else
+                nameField.text = filename.replace(/\.(exe|sh|py|pl|rb|run|bash|zsh|AppImage|appimage)$/i, "");
+        }
+        if (runtimePicker.runtimeType === "native") {
+            protonPrefixField.text = "";
+            winePrefixField.text = "";
+            return;
         }
         var defaultPrefix = settingsManager.defaultGamePrefix;
         var resolvedPrefix = defaultPrefix !== "" ? defaultPrefix : dialog.prefixBasePath + "/" + nameField.text.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
@@ -69,8 +77,19 @@ Kirigami.Dialog {
             winePrefixField.text = resolvedPrefix;
     }
 
+    function openForNewLinux() {
+        openForNew();
+        runtimePicker.setRuntimeType("native");
+    }
+
+    function openForNewWindows() {
+        openForNew();
+    }
+
     function openForNewWithExe(exePath) {
         openForNew();
+        if (!/\.exe$/i.test(exePath))
+            runtimePicker.setRuntimeType("native");
         applyExePath(exePath);
     }
 
@@ -155,11 +174,11 @@ Kirigami.Dialog {
             }
 
             RowLayout {
-                Kirigami.FormData.label: i18n("Executable (.exe):")
+                Kirigami.FormData.label: runtimePicker.runtimeType === "native" ? i18n("Executable / AppImage:") : i18n("Executable (.exe):")
                 QQC2.TextField {
                     id: exeField
                     Layout.fillWidth: true
-                    placeholderText: "/path/to/game.exe"
+                    placeholderText: runtimePicker.runtimeType === "native" ? "/path/to/app.AppImage" : "/path/to/game.exe"
                 }
                 QQC2.Button {
                     icon.name: "document-open"
@@ -250,7 +269,7 @@ Kirigami.Dialog {
         id: exeFileDialog
         title: i18n("Select Executable")
         currentFolder: "file://" + protonScanner.homePath()
-        nameFilters: [i18n("Executables (*.exe)"), i18n("All files (*)")]
+        nameFilters: runtimePicker.runtimeType === "native" ? [i18n("Binaries, scripts & AppImages (*.sh *.py *.pl *.rb *.run *.bash *.zsh *.AppImage *.appimage *.desktop)"), i18n("All files (*)")] : [i18n("Executables (*.exe)"), i18n("All files (*)")]
         onAccepted: {
             var path = decodeURIComponent(selectedFile.toString().replace("file://", ""));
             dialog.applyExePath(path);

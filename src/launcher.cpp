@@ -6,6 +6,7 @@
 #include <QDBusUnixFileDescriptor>
 #include <QDateTime>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QGuiApplication>
@@ -84,15 +85,27 @@ void Launcher::launch(const QString &binary,
                       const QProcessEnvironment &env,
                       const QString &launchOptions,
                       bool enableLogging,
-                      const QString &logName)
+                      const QString &logName,
+                      bool appendExe)
 {
     auto *proc = new QProcess(this);
+    auto *timer = new QElapsedTimer();
+    timer->start();
     m_runningProcesses.insert(exePath, proc);
     Q_EMIT runningExePathsChanged();
-    connect(proc, &QProcess::finished, this, [this, exePath, proc](int exitCode) {
+    connect(proc, &QProcess::finished, this, [this, exePath, proc, timer, enableLogging](int exitCode) {
         m_runningProcesses.remove(exePath);
         Q_EMIT runningExePathsChanged();
         Q_EMIT processFinished(exitCode);
+        if (exitCode != 0 && !enableLogging && timer->elapsed() < 5000) {
+            QString out = QString::fromLocal8Bit(proc->readAllStandardOutput()).trimmed();
+            if (!out.isEmpty()) {
+                if (out.length() > 400)
+                    out = QStringLiteral("...") + out.right(400);
+                Q_EMIT launchError(exePath, out);
+            }
+        }
+        delete timer;
         proc->deleteLater();
     });
 
@@ -108,7 +121,8 @@ void Launcher::launch(const QString &binary,
         QString baseCmd = shellQuote(binary);
         for (const auto &a : baseArgs)
             baseCmd += QStringLiteral(" ") + shellQuote(a);
-        baseCmd += QStringLiteral(" ") + shellQuote(exePath);
+        if (!exePath.isEmpty() && appendExe)
+            baseCmd += QStringLiteral(" ") + shellQuote(exePath);
 
         QString opts = launchOptions.trimmed();
         QString fullCmd =
@@ -117,7 +131,8 @@ void Launcher::launch(const QString &binary,
         proc->start(QStringLiteral("/bin/sh"), {QStringLiteral("-c"), fullCmd});
     } else {
         QStringList args = baseArgs;
-        args << exePath;
+        if (!exePath.isEmpty() && appendExe)
+            args << exePath;
         proc->start(binary, args);
     }
 
@@ -151,7 +166,9 @@ void Launcher::launchEntry(const QVariantMap &app)
         env.insert(QStringLiteral("PROTON_ENABLE_WAYLAND"), QStringLiteral("1"));
     }
 
-    if (app[QStringLiteral("runtimeType")].toString() == QStringLiteral("proton")) {
+    QString runtimeType = app[QStringLiteral("runtimeType")].toString();
+
+    if (runtimeType == QStringLiteral("proton")) {
         QString protonPath = app[QStringLiteral("protonPath")].toString();
         QString prefix = app[QStringLiteral("protonPrefix")].toString();
         if (!prefix.isEmpty())
@@ -172,6 +189,34 @@ void Launcher::launchEntry(const QVariantMap &app)
             env.insert(QStringLiteral("STEAM_COMPAT_DATA_PATH"), prefix);
             launch(protonPath + QStringLiteral("/proton"), {QStringLiteral("run")}, exePath, env, opts, logging, name);
         }
+    } else if (runtimeType == QStringLiteral("native")) {
+        QString binary = exePath;
+        QStringList baseArgs;
+        if (exePath.endsWith(QStringLiteral(".desktop"), Qt::CaseInsensitive)) {
+            QFile desktop(exePath);
+            if (desktop.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QString section;
+                QTextStream in(&desktop);
+                while (!in.atEnd()) {
+                    QString line = in.readLine().trimmed();
+                    if (line.startsWith(QLatin1Char('[')))
+                        section = line;
+                    if (section == QStringLiteral("[Desktop Entry]") && line.startsWith(QStringLiteral("Exec="))) {
+                        QString exec = line.mid(5).trimmed();
+                        exec.replace(QRegularExpression(QStringLiteral("\\s*%[fFuUdDnNickvm]")), QString());
+                        exec.replace(QStringLiteral("%%"), QStringLiteral("%"));
+                        binary = QStringLiteral("/bin/sh");
+                        baseArgs = {QStringLiteral("-c"), exec};
+                        break;
+                    }
+                }
+            }
+        }
+        QFileInfo fi(binary);
+        if (!exePath.endsWith(QStringLiteral(".desktop"), Qt::CaseInsensitive) && !fi.isExecutable())
+            QFile::setPermissions(binary, fi.permissions() | QFileDevice::ExeOwner | QFileDevice::ExeGroup | QFileDevice::ExeOther);
+        env.insert(QStringLiteral("APPIMAGE"), exePath);
+        launch(binary, baseArgs, exePath, env, opts, logging, name, false);
     } else {
         QString prefix = app[QStringLiteral("winePrefix")].toString();
         if (!prefix.isEmpty()) {

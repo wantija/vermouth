@@ -44,9 +44,14 @@ Kirigami.ApplicationWindow {
         actions: [
             Kirigami.Action {
                 id: firstDrawerAction
-                text: i18n("Add &App/Game")
+                text: i18n("Add &Windows App/Game")
                 icon.name: "list-add"
-                onTriggered: addDialog.openForNew()
+                onTriggered: addDialog.openForNewWindows()
+            },
+            Kirigami.Action {
+                text: i18n("Add &Linux App/Game")
+                icon.name: "list-add"
+                onTriggered: addDialog.openForNewLinux()
             },
             Kirigami.Action {
                 text: i18n("Run &Standalone EXE")
@@ -179,20 +184,35 @@ Kirigami.ApplicationWindow {
                     visible: root.bigPicture
                 }
                 QQC2.ToolButton {
+                    id: addBtn
                     text: i18n("Add &App/Game")
                     icon.name: "list-add"
                     icon.color: root.lightsOut ? root.loText : "transparent"
-                    onClicked: addDialog.openForNew()
                     visible: !root.bigPicture
+                    onClicked: addMenu.popup(addBtn, 0, addBtn.height)
+                }
+                QQC2.Menu {
+                    id: addMenu
+                    closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
+                    QQC2.MenuItem {
+                        text: i18n("Add Windows App/Game")
+                        icon.name: "list-add"
+                        onTriggered: addDialog.openForNewWindows()
+                    }
+                    QQC2.MenuItem {
+                        text: i18n("Add Linux App/Game")
+                        icon.name: "list-add"
+                        onTriggered: addDialog.openForNewLinux()
+                    }
                 }
                 QQC2.ToolButton {
-                    property bool isRunning: gridView.selectedIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.selectedIndex).exePath) >= 0
+                    property bool isRunning: gridView.currentIndex >= 0 && launcher.runningExePaths.indexOf(appModel.getApp(gridView.currentIndex).exePath) >= 0
                     visible: !root.bigPicture
                     icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
                     icon.color: root.lightsOut ? root.loText : "transparent"
-                    enabled: gridView.selectedIndex >= 0
+                    enabled: gridView.currentIndex >= 0
                     onClicked: {
-                        var app = appModel.getApp(gridView.selectedIndex);
+                        var app = appModel.getApp(gridView.currentIndex);
                         if (isRunning)
                             launcher.stopEntry(app);
                         else
@@ -221,10 +241,16 @@ Kirigami.ApplicationWindow {
             contentItem: RowLayout {
                 QQC2.Label {
                     text: {
-                        if (gridView.selectedIndex < 0)
+                        if (gridView.currentIndex < 0)
                             return "";
-                        var app = appModel.getApp(gridView.selectedIndex);
-                        var runner = app.runtimeType === "proton" ? app.protonPath.split("/").pop() : app.wineBinary;
+                        var app = appModel.getApp(gridView.currentIndex);
+                        var runner;
+                        if (app.runtimeType === "proton")
+                            runner = app.protonPath.split("/").pop();
+                        else if (app.runtimeType === "wine")
+                            runner = app.wineBinary;
+                        else
+                            runner = "Native";
                         return i18n("%1 - %2", runner, app.exePath);
                     }
                     color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
@@ -412,7 +438,6 @@ Kirigami.ApplicationWindow {
             if (globalDrawer.drawerOpen)
                 globalDrawer.close();
             searchField.forceActiveFocus();
-            gridView.selectedIndex = -1;
             gridView.currentIndex = -1;
             Qt.inputMethod.show();
         }
@@ -474,7 +499,7 @@ Kirigami.ApplicationWindow {
             showPassiveNotification(i18n("Launched: %1", name), 3000);
         }
         function onLaunchError(name, error) {
-            showPassiveNotification(i18n("Error: %1", error), 5000);
+            showPassiveNotification(i18n("Error launching: %1", error), 6000);
         }
         function onPrefixNotReady(name) {
             prefixNotReadyDialog.appName = name;

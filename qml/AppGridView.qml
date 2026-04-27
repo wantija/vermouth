@@ -21,38 +21,35 @@ GridView {
     focus: true
     keyNavigationEnabled: true
 
-    property int selectedIndex: currentIndex
-
-    onCurrentIndexChanged: selectedIndex = currentIndex
-
     TapHandler {
         onTapped: {
             gridView.currentIndex = -1;
-            gridView.selectedIndex = -1;
         }
     }
 
     Shortcut {
         sequence: "Return"
-        enabled: gridView.selectedIndex >= 0
+        enabled: gridView.currentIndex >= 0
         onActivated: {
-            var app = appModel.getApp(gridView.selectedIndex);
+            var app = appModel.getApp(gridView.currentIndex);
             launcher.launchEntry(app);
         }
     }
     Shortcut {
         sequence: "Delete"
-        enabled: gridView.selectedIndex >= 0
+        enabled: gridView.currentIndex >= 0
         onActivated: {
-            confirmDeleteAppDialog.payload = gridView.selectedIndex;
+            var app = appModel.getApp(gridView.currentIndex);
+            confirmDeleteAppDialog.runtimeType = app.runtimeType;
+            confirmDeleteAppDialog.payload = gridView.currentIndex;
             confirmDeleteAppDialog.open();
         }
     }
     Shortcut {
         sequence: "Shift+Delete"
-        enabled: gridView.selectedIndex >= 0
+        enabled: gridView.currentIndex >= 0 && appModel.getApp(gridView.currentIndex).runtimeType !== "native"
         onActivated: {
-            confirmDeleteDialog.payload = gridView.selectedIndex;
+            confirmDeleteDialog.payload = gridView.currentIndex;
             confirmDeleteDialog.open();
         }
     }
@@ -82,7 +79,6 @@ GridView {
             anchors.fill: parent
             anchors.margins: Kirigami.Units.smallSpacing
             radius: Kirigami.Units.cornerRadius
-            //color: gridView.lightsOut ? Kirigami.Theme.alternateBackgroundColor : "white"
             color: "transparent"
             border.color: delegateRoot.isSelected ? Kirigami.Theme.highlightColor : mouseArea.containsMouse ? Qt.darker(Kirigami.Theme.highlightColor, 1.5) : "transparent"
             border.width: delegateRoot.isSelected ? 2 : mouseArea.containsMouse ? 1 : 0
@@ -154,14 +150,19 @@ GridView {
                     Layout.preferredWidth: 80 * gridView.scaleFactor
                     Layout.preferredHeight: 80 * gridView.scaleFactor
                     radius: Kirigami.Units.cornerRadius
-                    //color: delegateRoot.iconPath === "" ? Kirigami.Theme.alternateBackgroundColor : (gridView.lightsOut ? Kirigami.Theme.backgroundColor : Qt.rgba(0.95, 0.95, 0.95, 1))
                     color: "transparent"
 
                     Image {
                         anchors.centerIn: parent
                         width: 70 * gridView.scaleFactor
                         height: 70 * gridView.scaleFactor
-                        source: delegateRoot.iconPath !== "" ? "file://" + delegateRoot.iconPath : ""
+                        source: {
+                            if (delegateRoot.iconPath === "")
+                                return "";
+                            if (delegateRoot.iconPath.startsWith("/"))
+                                return "file://" + delegateRoot.iconPath;
+                            return "image://icon/" + delegateRoot.iconPath;
+                        }
                         visible: delegateRoot.iconPath !== ""
                         fillMode: Image.PreserveAspectFit
                         sourceSize: Qt.size(128, 128)
@@ -254,6 +255,7 @@ GridView {
             }
             QQC2.MenuSeparator {}
             QQC2.MenuItem {
+                visible: delegateRoot.runtimeType !== "native"
                 text: i18n("Run another EXE in this prefix")
                 icon.name: "system-run"
                 onTriggered: {
@@ -261,7 +263,9 @@ GridView {
                     runExeDialog.open();
                 }
             }
-            QQC2.MenuSeparator {}
+            QQC2.MenuSeparator {
+                visible: delegateRoot.runtimeType !== "native"
+            }
             QQC2.MenuItem {
                 text: i18n("Create start menu entry")
                 icon.name: "application-menu"
@@ -279,6 +283,7 @@ GridView {
                 }
             }
             QQC2.Menu {
+                enabled: delegateRoot.runtimeType !== "native"
                 title: i18n("&Wine Utilities")
                 icon.name: "wine" // fallback icon
 
@@ -318,6 +323,7 @@ GridView {
                 onTriggered: Qt.openUrlExternally("file://" + launcher.logDir())
             }
             QQC2.MenuItem {
+                visible: delegateRoot.runtimeType !== "native"
                 text: i18n("Open prefix folder")
                 icon.name: "folder-open"
                 onTriggered: {
@@ -337,11 +343,13 @@ GridView {
                 text: i18n("Remove")
                 icon.name: "edit-delete"
                 onTriggered: {
+                    confirmDeleteAppDialog.runtimeType = delegateRoot.runtimeType;
                     confirmDeleteAppDialog.payload = delegateRoot.index;
                     confirmDeleteAppDialog.open();
                 }
             }
             QQC2.MenuItem {
+                visible: delegateRoot.runtimeType !== "native"
                 text: i18n("Remove and Delete Prefix")
                 icon.name: "edit-delete"
                 onTriggered: {
@@ -364,8 +372,9 @@ GridView {
     Kirigami.PromptDialog {
         id: confirmDeleteAppDialog
         property var payload
+        property string runtimeType: ""
         title: i18n("Delete the app?")
-        subtitle: i18n("This will delete the app but preserve the prefix folder.")
+        subtitle: runtimeType === "native" ? i18n("This will delete the app from the library.") : i18n("This will delete the app but preserve the prefix folder.")
         onAccepted: appModel.removeApp(payload)
         standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
     }

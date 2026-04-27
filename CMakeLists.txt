@@ -47,6 +47,7 @@ qt_add_executable(vermouth
     src/settingsmanager.cpp
     src/protondownloader.cpp
     src/umudownloader.cpp
+    src/downloader.cpp
     src/singleinstance.cpp
     src/gamepadhandler.cpp
     resources.qrc

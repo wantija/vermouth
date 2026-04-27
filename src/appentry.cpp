@@ -6,7 +6,9 @@ QJsonObject AppEntry::toJson() const
     obj[QStringLiteral("id")] = id;
     obj[QStringLiteral("name")] = name;
     obj[QStringLiteral("exePath")] = exePath;
-    obj[QStringLiteral("runtimeType")] = (runtimeType == Proton) ? QStringLiteral("proton") : QStringLiteral("wine");
+    obj[QStringLiteral("runtimeType")] = runtimeType == Proton ? QStringLiteral("proton")
+        : runtimeType == Wine                                  ? QStringLiteral("wine")
+                                                               : QStringLiteral("native");
     obj[QStringLiteral("protonPath")] = protonPath;
     obj[QStringLiteral("protonPrefix")] = protonPrefix;
     obj[QStringLiteral("wineBinary")] = wineBinary;
@@ -17,6 +19,26 @@ QJsonObject AppEntry::toJson() const
     return obj;
 }
 
+QVariantMap AppEntry::toVariantMap() const
+{
+    return {
+        {QStringLiteral("id"), id},
+        {QStringLiteral("name"), name},
+        {QStringLiteral("exePath"), exePath},
+        {QStringLiteral("runtimeType"),
+         runtimeType == Proton       ? QStringLiteral("proton")
+             : runtimeType == Native ? QStringLiteral("native")
+                                     : QStringLiteral("wine")},
+        {QStringLiteral("protonPath"), protonPath},
+        {QStringLiteral("protonPrefix"), protonPrefix},
+        {QStringLiteral("wineBinary"), wineBinary},
+        {QStringLiteral("winePrefix"), winePrefix},
+        {QStringLiteral("iconPath"), iconPath},
+        {QStringLiteral("launchOptions"), launchOptions},
+        {QStringLiteral("enableLogging"), enableLogging},
+    };
+}
+
 AppEntry AppEntry::fromJson(const QJsonObject &obj)
 {
     AppEntry e;
@@ -25,7 +47,8 @@ AppEntry AppEntry::fromJson(const QJsonObject &obj)
         e.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     e.name = obj[QStringLiteral("name")].toString();
     e.exePath = obj[QStringLiteral("exePath")].toString();
-    e.runtimeType = (obj[QStringLiteral("runtimeType")].toString() == QStringLiteral("proton")) ? Proton : Wine;
+    QString rt = obj[QStringLiteral("runtimeType")].toString();
+    e.runtimeType = rt == QStringLiteral("proton") ? Proton : rt == QStringLiteral("native") ? Native : Wine;
     e.protonPath = obj[QStringLiteral("protonPath")].toString();
     e.protonPrefix = obj[QStringLiteral("protonPrefix")].toString();
     e.wineBinary = obj[QStringLiteral("wineBinary")].toString();
