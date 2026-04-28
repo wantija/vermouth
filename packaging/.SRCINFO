@@ -8,6 +8,7 @@ pkgbase = vermouth
 	makedepends = cmake
 	makedepends = ninja
 	makedepends = extra-cmake-modules
+	makedepends = sdl2
 	depends = qt6-base
 	depends = qt6-declarative
 	depends = kirigami
@@ -15,7 +16,8 @@ pkgbase = vermouth
 	depends = kcoreaddons
 	depends = qqc2-desktop-style
 	optdepends = icoutils: Windows icon extraction
+	optdepends = sdl2: gamepad support
 	source = vermouth-1.4.1.tar.gz::https://github.com/dekomote/vermouth/archive/refs/tags/v1.4.1.tar.gz
-	sha256sums = c69c0884225867130d3f09fbcb55bf8cbb578f9a9b9fecb4993890aab9d366b5
+	sha256sums = e617666c09cddc526ac8d92f0025f4a26d06437c3cda8bc117ecd5a2d46221a2
 
 pkgname = vermouth

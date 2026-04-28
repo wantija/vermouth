@@ -90,6 +90,15 @@ int main(int argc, char *argv[])
 
     Launcher launcher;
 
+    auto launchCli = [&](const QVariantMap &entry) -> int {
+        QObject::connect(&launcher, &Launcher::processFinished, &app, &QApplication::exit);
+        QObject::connect(&launcher, &Launcher::launchError, &app, [](const QString &, const QString &) {
+            QApplication::exit(1);
+        });
+        launcher.launchEntry(entry);
+        return app.exec();
+    };
+
     // Launch by config ID - looks up entry from apps.json
     if (parser.isSet(launchIdOpt)) {
         AppModel appModel;
@@ -98,13 +107,7 @@ int main(int argc, char *argv[])
             qCritical() << "No app found with id:" << parser.value(launchIdOpt);
             return 1;
         }
-
-        QObject::connect(&launcher, &Launcher::processFinished, &app, &QApplication::exit);
-        QObject::connect(&launcher, &Launcher::launchError, &app, [](const QString &, const QString &) {
-            QApplication::exit(1);
-        });
-        launcher.launchEntry(entry);
-        return app.exec();
+        return launchCli(entry);
     }
 
     // Direct launch mode - no GUI
@@ -124,13 +127,7 @@ int main(int argc, char *argv[])
             entry[QStringLiteral("winePrefix")] = parser.value(prefixOpt);
             entry[QStringLiteral("exePath")] = parser.value(launchWineOpt);
         }
-
-        QObject::connect(&launcher, &Launcher::processFinished, &app, &QApplication::exit);
-        QObject::connect(&launcher, &Launcher::launchError, &app, [](const QString &, const QString &) {
-            QApplication::exit(1);
-        });
-        launcher.launchEntry(entry);
-        return app.exec();
+        return launchCli(entry);
     }
 
     // Check for positional args early so we can forward them if already running.
@@ -141,6 +138,10 @@ int main(int argc, char *argv[])
         if (arg.startsWith(QStringLiteral("file://")))
             arg = QUrl(arg).toLocalFile();
         openExePath = arg;
+        AppModel tempModel;
+        QVariantMap entry = tempModel.getAppByExePath(openExePath);
+        if (!entry.isEmpty())
+            return launchCli(entry);
     }
 
     SingleInstance singleInstance;
