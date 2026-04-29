@@ -332,8 +332,9 @@ build_appimage() {
                 qt6-base-dev qt6-declarative-dev qt6-tools-dev-tools qmake6 \
                 libkirigami-dev libkf6coreaddons-dev libkf6i18n-dev libkf6qqc2desktopstyle-dev \
                 qml6-module-org-kde-kirigami qml6-module-org-kde-desktop \
-                qml6-module-org-kde-iconthemes qml6-module-org-kde-sonnet \
-                qt6-wayland breeze libsdl2-dev
+                qml6-module-org-kde-iconthemes \
+                qt6-wayland libsdl2-dev qml-module-org-kde-qqc2desktopstyle qt6-xdgdesktopportal-platformtheme \
+                libqt6waylandclient6
 
             cp -r /src /build
             cd /build
@@ -346,17 +347,15 @@ build_appimage() {
             wget -q -O linuxdeploy 'https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage'
             wget -q -O linuxdeploy-plugin-qt 'https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage'
             chmod +x linuxdeploy linuxdeploy-plugin-qt
-            ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy-extracted
-            ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt-extracted
-            ln -s \"\$PWD/linuxdeploy-plugin-qt-extracted/AppRun\" linuxdeploy-extracted/plugins/linuxdeploy-plugin-qt
 
             export QML_SOURCES_PATHS=/build/qml
-            export QMAKE=/usr/bin/qmake6
-            export EXTRA_QT_PLUGINS='svg;wayland-shell-integration;wayland-graphics-integration-client'
+            export QML_MODULES_PATHS=/usr/lib/x86_64-linux-gnu/qt6/qml
+            export EXTRA_QT_MODULES='xcbintegration;waylandcompositor;svg;qml;platform'
+            export DEPLOY_PLATFORM_THEMES=1
             export APPIMAGE_EXTRACT_AND_RUN=1
             export VERSION=${VERSION}
 
-            ./linuxdeploy-extracted/AppRun --appdir AppDir \
+            ./linuxdeploy --appdir AppDir \
                 --desktop-file AppDir/usr/share/applications/com.dekomote.vermouth.desktop \
                 --icon-file AppDir/usr/share/icons/hicolor/scalable/apps/com.dekomote.vermouth.svg \
                 --plugin qt \
@@ -368,7 +367,6 @@ build_appimage() {
         pass "AppImage — package written to dist/"
     else
         fail "AppImage build failed"
-        echo "$log" | tail -20 | sed 's/^/    /'
     fi
 }
 
@@ -381,14 +379,14 @@ case "$TARGETS" in
         build_flatpak
         build_appimage
         ;;
-    fedora)   build_rpm_fedora ;;
-    opensuse) build_rpm_opensuse ;;
-    deb)      build_deb ;;
-    arch)     build_arch ;;
-    flatpak)  build_flatpak ;;
-    appimage) build_appimage ;;
+    fedora)           build_rpm_fedora ;;
+    opensuse)         build_rpm_opensuse ;;
+    deb)              build_deb ;;
+    arch)             build_arch ;;
+    flatpak)          build_flatpak ;;
+    appimage)         build_appimage ;;
     *)
-        echo "Usage: $0 [all|fedora|opensuse|deb|arch|flatpak|appimage]"
+        echo "Usage: $0 [all|fedora|opensuse|deb|arch|flatpak|appimage|appimage-fedora]"
         exit 1
         ;;
 esac
