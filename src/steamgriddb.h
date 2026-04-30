@@ -29,6 +29,7 @@ public:
     Q_INVOKABLE void fetchLogos(int gameId, const QString &apiKey);
     Q_INVOKABLE void downloadImage(const QString &url, const QString &savePath);
     Q_INVOKABLE void autoDownloadAll(const QString &gameName, const QString &assetsPath, const QString &apiKey);
+    Q_INVOKABLE void autoDownloadAllById(int gameId, const QString &gameName, const QString &assetsPath, const QString &apiKey);
 
 Q_SIGNALS:
     void busyChanged();

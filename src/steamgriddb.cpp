@@ -405,6 +405,27 @@ void SteamGridDB::autoFetchLogos()
     });
 }
 
+void SteamGridDB::autoDownloadAllById(int gameId, const QString &gameName, const QString &assetsPath, const QString &apiKey)
+{
+    if (m_autoBusy || gameId <= 0)
+        return;
+
+    m_autoBusy = true;
+    Q_EMIT autoDownloadingChanged();
+
+    m_autoApiKey = apiKey;
+    m_autoAssetsPath = assetsPath;
+    m_autoSafeName = QString(gameName).replace(QRegularExpression(QStringLiteral("[^a-zA-Z0-9_-]")), QStringLiteral("_")).toLower();
+    m_autoGameId = gameId;
+    m_autoIconPath.clear();
+    m_autoGridPath.clear();
+    m_autoHeroPath.clear();
+    m_autoLogoPath.clear();
+
+    Q_EMIT autoDownloadProgress(tr("Downloading…"));
+    autoFetchIcons();
+}
+
 void SteamGridDB::autoFinish()
 {
     m_autoBusy = false;

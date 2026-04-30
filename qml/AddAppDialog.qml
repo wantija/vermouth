@@ -34,6 +34,9 @@ Kirigami.Dialog {
     property int editIndex: -1
     property string prefixBasePath
     property string autoDownloadTargetId: ""
+    property bool pendingAutoDownload: false
+    property bool autoDownloadingInDialog: false
+    property string autoDownloadStatus: ""
 
     function openForNew() {
         editMode = false;
@@ -50,6 +53,9 @@ Kirigami.Dialog {
         logoField.text = "";
         steamGridDbIdField.text = "";
         artSection.expanded = false;
+        pendingAutoDownload = false;
+        autoDownloadingInDialog = false;
+        autoDownloadStatus = "";
         runtimePicker.reset();
         prefixBasePath = protonScanner.prefixBasePath();
         dialog.open();
@@ -116,6 +122,9 @@ Kirigami.Dialog {
         steamGridDbIdField.text = app.steamGridDbId > 0 ? app.steamGridDbId.toString() : "";
         artSection.expanded = gridField.text !== "" || heroField.text !== "" || logoField.text !== "";
         prefixBasePath = protonScanner.prefixBasePath();
+        pendingAutoDownload = false;
+        autoDownloadingInDialog = false;
+        autoDownloadStatus = "";
         runtimePicker.loadFromApp(app);
         dialog.open();
     }
@@ -221,12 +230,38 @@ Kirigami.Dialog {
                 }
                 QQC2.Button {
                     icon.name: "search"
-                    enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy
+                    enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy && !steamGridDb.autoDownloading
                     QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Search SteamGridDB to set the ID")
                     QQC2.ToolTip.visible: hovered
                     QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
                     onClicked: steamGridDbPicker.openPickerForId(nameField.text, settingsManager.steamGridDbApiKey)
                 }
+                QQC2.Button {
+                    icon.name: "download"
+                    enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.autoDownloading && !steamGridDb.busy
+                    QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Auto-download all art from SteamGridDB")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    onClicked: {
+                        var storedId = parseInt(steamGridDbIdField.text);
+                        if (!isNaN(storedId) && storedId > 0) {
+                            dialog.autoDownloadingInDialog = true;
+                            dialog.autoDownloadStatus = "";
+                            steamGridDb.autoDownloadAllById(storedId, nameField.text, protonScanner.localAssetsPath(), settingsManager.steamGridDbApiKey);
+                        } else {
+                            dialog.pendingAutoDownload = true;
+                            steamGridDbPicker.openPickerForId(nameField.text, settingsManager.steamGridDbApiKey);
+                        }
+                    }
+                }
+            }
+
+            QQC2.Label {
+                visible: dialog.autoDownloadStatus !== "" || steamGridDb.autoDownloading && dialog.autoDownloadingInDialog
+                text: steamGridDb.autoDownloading && dialog.autoDownloadingInDialog ? steamGridDb.statusText : dialog.autoDownloadStatus
+                opacity: 0.75
+                font.italic: true
+                Kirigami.FormData.label: ""
             }
 
             RowLayout {
@@ -490,6 +525,12 @@ Kirigami.Dialog {
         }
         onGameIdFound: function (id) {
             steamGridDbIdField.text = id.toString();
+            if (dialog.pendingAutoDownload) {
+                dialog.pendingAutoDownload = false;
+                dialog.autoDownloadingInDialog = true;
+                dialog.autoDownloadStatus = "";
+                steamGridDb.autoDownloadAllById(id, nameField.text, protonScanner.localAssetsPath(), settingsManager.steamGridDbApiKey);
+            }
         }
     }
 
@@ -499,7 +540,30 @@ Kirigami.Dialog {
             if (dialog.autoDownloadTargetId !== "") {
                 appModel.updateAppArt(dialog.autoDownloadTargetId, iconPath, gridPath, heroPath, logoPath, gameId);
                 dialog.autoDownloadTargetId = "";
+            } else if (dialog.autoDownloadingInDialog) {
+                dialog.autoDownloadingInDialog = false;
+                dialog.autoDownloadStatus = i18n("Art downloaded!");
+                if (iconPath !== "")
+                    iconField.text = iconPath;
+                if (gridPath !== "") {
+                    gridField.text = gridPath;
+                    artSection.expanded = true;
+                }
+                if (heroPath !== "") {
+                    heroField.text = heroPath;
+                    artSection.expanded = true;
+                }
+                if (logoPath !== "") {
+                    logoField.text = logoPath;
+                    artSection.expanded = true;
+                }
+                if (gameId > 0)
+                    steamGridDbIdField.text = gameId.toString();
             }
+        }
+        function onAutoDownloadProgress(step) {
+            if (dialog.autoDownloadingInDialog)
+                dialog.autoDownloadStatus = step;
         }
     }
 }
