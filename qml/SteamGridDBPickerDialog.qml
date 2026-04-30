@@ -57,6 +57,7 @@ Kirigami.Dialog {
 
     Connections {
         target: steamGridDb
+        enabled: dialog.visible
         function onSearchFinished(games) {
             gamesModel.clear();
             for (var i = 0; i < Math.min(games.length, 20); i++) {
@@ -102,9 +103,11 @@ Kirigami.Dialog {
     function openPickerWithId(gameId, name, type, key, fieldId) {
         idOnly = false;
         gameName = name;
+        selectedGameName = "";
         artType = type;
         apiKey = key;
         targetField = fieldId;
+        gamesModel.clear();
         artModel.clear();
         pickerState = "fetchingArt";
         dialog.open();
@@ -165,6 +168,7 @@ Kirigami.Dialog {
         var fileName = safeName + "_" + artType + "_" + item.id + "." + ext;
         var savePath = protonScanner.localAssetsPath() + "/" + fileName;
         pickerState = "downloading";
+        downloadProgress.value = 0;
         steamGridDb.downloadImage(url, savePath);
     }
 
@@ -289,7 +293,7 @@ Kirigami.Dialog {
                 color: Kirigami.Theme.backgroundColor
                 border.color: artMouseArea.containsMouse ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
                 border.width: artMouseArea.containsMouse ? 2 : 1
-                clip: true
+                layer.enabled: true
 
                 Image {
                     anchors.fill: parent
