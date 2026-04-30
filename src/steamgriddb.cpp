@@ -68,6 +68,42 @@ void SteamGridDB::makeRequest(const QUrl &url, const QString &apiKey, const std:
     });
 }
 
+void SteamGridDB::fetchArt(int gameId,
+                           const QString &apiKey,
+                           const QString &type,
+                           const QString &query,
+                           const QString &status,
+                           std::function<void(const QVariantList &)> emitSignal)
+{
+    if (busy() || gameId <= 0 || apiKey.isEmpty())
+        return;
+
+    setBusy(true);
+    setStatusText(status);
+
+    auto urlStr = QStringLiteral("https://www.steamgriddb.com/api/v2/%1/game/%2").arg(type, QString::number(gameId));
+    if (!query.isEmpty())
+        urlStr += QLatin1Char('?') + query;
+
+    makeRequest(QUrl(urlStr), apiKey, [this, emitSignal](const QJsonArray &data) {
+        QVariantList items;
+        for (const auto &val : data) {
+            auto obj = val.toObject();
+            QVariantMap item;
+            item[QStringLiteral("id")] = obj.value(QStringLiteral("id")).toInt();
+            item[QStringLiteral("url")] = obj.value(QStringLiteral("url")).toString();
+            item[QStringLiteral("thumb")] = obj.value(QStringLiteral("thumb")).toString();
+            item[QStringLiteral("score")] = obj.value(QStringLiteral("score")).toInt();
+            item[QStringLiteral("style")] = obj.value(QStringLiteral("style")).toString();
+            auto author = obj.value(QStringLiteral("author")).toObject();
+            item[QStringLiteral("author")] = author.value(QStringLiteral("name")).toString();
+            items.append(item);
+        }
+        setBusy(false);
+        emitSignal(items);
+    });
+}
+
 void SteamGridDB::searchGames(const QString &query, const QString &apiKey)
 {
     if (busy() || query.isEmpty() || apiKey.isEmpty())
@@ -94,112 +130,33 @@ void SteamGridDB::searchGames(const QString &query, const QString &apiKey)
 
 void SteamGridDB::fetchGrids(int gameId, const QString &apiKey)
 {
-    if (busy() || gameId <= 0 || apiKey.isEmpty())
-        return;
-
-    setBusy(true);
-    setStatusText(tr("Fetching grids…"));
-
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/grids/game/%1").arg(gameId));
-    makeRequest(url, apiKey, [this](const QJsonArray &data) {
-        QVariantList items;
-        for (const auto &val : data) {
-            auto obj = val.toObject();
-            QVariantMap item;
-            item[QStringLiteral("id")] = obj.value(QStringLiteral("id")).toInt();
-            item[QStringLiteral("url")] = obj.value(QStringLiteral("url")).toString();
-            item[QStringLiteral("thumb")] = obj.value(QStringLiteral("thumb")).toString();
-            item[QStringLiteral("score")] = obj.value(QStringLiteral("score")).toInt();
-            item[QStringLiteral("style")] = obj.value(QStringLiteral("style")).toString();
-            auto author = obj.value(QStringLiteral("author")).toObject();
-            item[QStringLiteral("author")] = author.value(QStringLiteral("name")).toString();
-            items.append(item);
-        }
-        setBusy(false);
+    fetchArt(gameId, apiKey, QStringLiteral("grids"), {}, tr("Fetching grids…"), [this](const QVariantList &items) {
         Q_EMIT gridsFinished(items);
     });
 }
 
 void SteamGridDB::fetchHeroes(int gameId, const QString &apiKey)
 {
-    if (busy() || gameId <= 0 || apiKey.isEmpty())
-        return;
-
-    setBusy(true);
-    setStatusText(tr("Fetching heroes…"));
-
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/heroes/game/%1").arg(gameId));
-    makeRequest(url, apiKey, [this](const QJsonArray &data) {
-        QVariantList items;
-        for (const auto &val : data) {
-            auto obj = val.toObject();
-            QVariantMap item;
-            item[QStringLiteral("id")] = obj.value(QStringLiteral("id")).toInt();
-            item[QStringLiteral("url")] = obj.value(QStringLiteral("url")).toString();
-            item[QStringLiteral("thumb")] = obj.value(QStringLiteral("thumb")).toString();
-            item[QStringLiteral("score")] = obj.value(QStringLiteral("score")).toInt();
-            item[QStringLiteral("style")] = obj.value(QStringLiteral("style")).toString();
-            auto author = obj.value(QStringLiteral("author")).toObject();
-            item[QStringLiteral("author")] = author.value(QStringLiteral("name")).toString();
-            items.append(item);
-        }
-        setBusy(false);
+    fetchArt(gameId, apiKey, QStringLiteral("heroes"), {}, tr("Fetching heroes…"), [this](const QVariantList &items) {
         Q_EMIT heroesFinished(items);
     });
 }
 
 void SteamGridDB::fetchIcons(int gameId, const QString &apiKey)
 {
-    if (busy() || gameId <= 0 || apiKey.isEmpty())
-        return;
-
-    setBusy(true);
-    setStatusText(tr("Fetching icons…"));
-
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/icons/game/%1?dimensions=128,256,512").arg(gameId));
-    makeRequest(url, apiKey, [this](const QJsonArray &data) {
-        QVariantList items;
-        for (const auto &val : data) {
-            auto obj = val.toObject();
-            QVariantMap item;
-            item[QStringLiteral("id")] = obj.value(QStringLiteral("id")).toInt();
-            item[QStringLiteral("url")] = obj.value(QStringLiteral("url")).toString();
-            item[QStringLiteral("thumb")] = obj.value(QStringLiteral("thumb")).toString();
-            item[QStringLiteral("score")] = obj.value(QStringLiteral("score")).toInt();
-            item[QStringLiteral("style")] = obj.value(QStringLiteral("style")).toString();
-            auto author = obj.value(QStringLiteral("author")).toObject();
-            item[QStringLiteral("author")] = author.value(QStringLiteral("name")).toString();
-            items.append(item);
-        }
-        setBusy(false);
-        Q_EMIT iconsFinished(items);
-    });
+    fetchArt(gameId,
+             apiKey,
+             QStringLiteral("icons"),
+             QStringLiteral("dimensions=64,128,256,512&mimes=image/png"),
+             tr("Fetching icons…"),
+             [this](const QVariantList &items) {
+                 Q_EMIT iconsFinished(items);
+             });
 }
 
 void SteamGridDB::fetchLogos(int gameId, const QString &apiKey)
 {
-    if (busy() || gameId <= 0 || apiKey.isEmpty())
-        return;
-
-    setBusy(true);
-    setStatusText(tr("Fetching logos…"));
-
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/logos/game/%1").arg(gameId));
-    makeRequest(url, apiKey, [this](const QJsonArray &data) {
-        QVariantList items;
-        for (const auto &val : data) {
-            auto obj = val.toObject();
-            QVariantMap item;
-            item[QStringLiteral("id")] = obj.value(QStringLiteral("id")).toInt();
-            item[QStringLiteral("url")] = obj.value(QStringLiteral("url")).toString();
-            item[QStringLiteral("thumb")] = obj.value(QStringLiteral("thumb")).toString();
-            item[QStringLiteral("score")] = obj.value(QStringLiteral("score")).toInt();
-            item[QStringLiteral("style")] = obj.value(QStringLiteral("style")).toString();
-            auto author = obj.value(QStringLiteral("author")).toObject();
-            item[QStringLiteral("author")] = author.value(QStringLiteral("name")).toString();
-            items.append(item);
-        }
-        setBusy(false);
+    fetchArt(gameId, apiKey, QStringLiteral("logos"), {}, tr("Fetching logos…"), [this](const QVariantList &items) {
         Q_EMIT logosFinished(items);
     });
 }
@@ -242,39 +199,6 @@ void SteamGridDB::downloadImage(const QString &url, const QString &savePath)
         Q_EMIT downloadFinished(savePath);
         setStatusText(tr("Downloaded!"));
         setBusy(false);
-    });
-}
-
-// ── Auto-download chain ────────────────────────────────────────────────────
-
-void SteamGridDB::autoDownloadAll(const QString &gameName, const QString &assetsPath, const QString &apiKey)
-{
-    if (m_autoBusy)
-        return;
-
-    m_autoBusy = true;
-    Q_EMIT autoDownloadingChanged();
-
-    m_autoApiKey = apiKey;
-    m_autoAssetsPath = assetsPath;
-    m_autoSafeName = QString(gameName).replace(QRegularExpression(QStringLiteral("[^a-zA-Z0-9_-]")), QStringLiteral("_")).toLower();
-    m_autoGameId = 0;
-    m_autoIconPath.clear();
-    m_autoGridPath.clear();
-    m_autoHeroPath.clear();
-    m_autoLogoPath.clear();
-
-    Q_EMIT autoDownloadProgress(tr("Searching…"));
-
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/search/autocomplete/%1").arg(QString::fromUtf8(QUrl::toPercentEncoding(gameName))));
-
-    autoMakeRequest(url, [this](const QJsonArray &data) {
-        if (data.isEmpty()) {
-            autoFinish();
-            return;
-        }
-        m_autoGameId = data.first().toObject().value(QStringLiteral("id")).toInt();
-        autoFetchIcons();
     });
 }
 
@@ -337,71 +261,36 @@ void SteamGridDB::autoDownloadFile(const QString &imgUrl, const QString &suffix,
     });
 }
 
-void SteamGridDB::autoFetchIcons()
+void SteamGridDB::initAutoDownload(const QString &gameName, const QString &assetsPath, const QString &apiKey)
 {
-    Q_EMIT autoDownloadProgress(tr("Downloading icon…"));
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/icons/game/%1?dimensions=128,256,512").arg(m_autoGameId));
-    autoMakeRequest(url, [this](const QJsonArray &data) {
-        if (data.isEmpty()) {
-            autoFetchGrids();
-            return;
-        }
-        QString imgUrl = data.first().toObject().value(QStringLiteral("url")).toString();
-        autoDownloadFile(imgUrl, QStringLiteral("icon"), [this](const QString &path) {
-            m_autoIconPath = path;
-            autoFetchGrids();
-        });
-    });
+    m_autoBusy = true;
+    Q_EMIT autoDownloadingChanged();
+    m_autoApiKey = apiKey;
+    m_autoAssetsPath = assetsPath;
+    m_autoSafeName = QString(gameName).replace(QRegularExpression(QStringLiteral("[^a-zA-Z0-9_-]")), QStringLiteral("_")).toLower();
+    m_autoGameId = 0;
+    m_autoIconPath.clear();
+    m_autoGridPath.clear();
+    m_autoHeroPath.clear();
+    m_autoLogoPath.clear();
 }
 
-void SteamGridDB::autoFetchGrids()
+void SteamGridDB::autoDownloadAll(const QString &gameName, const QString &assetsPath, const QString &apiKey)
 {
-    Q_EMIT autoDownloadProgress(tr("Downloading grid…"));
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/grids/game/%1").arg(m_autoGameId));
-    autoMakeRequest(url, [this](const QJsonArray &data) {
-        if (data.isEmpty()) {
-            autoFetchHeroes();
-            return;
-        }
-        QString imgUrl = data.first().toObject().value(QStringLiteral("url")).toString();
-        autoDownloadFile(imgUrl, QStringLiteral("grid"), [this](const QString &path) {
-            m_autoGridPath = path;
-            autoFetchHeroes();
-        });
-    });
-}
+    if (m_autoBusy)
+        return;
 
-void SteamGridDB::autoFetchHeroes()
-{
-    Q_EMIT autoDownloadProgress(tr("Downloading hero…"));
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/heroes/game/%1").arg(m_autoGameId));
-    autoMakeRequest(url, [this](const QJsonArray &data) {
-        if (data.isEmpty()) {
-            autoFetchLogos();
-            return;
-        }
-        QString imgUrl = data.first().toObject().value(QStringLiteral("url")).toString();
-        autoDownloadFile(imgUrl, QStringLiteral("hero"), [this](const QString &path) {
-            m_autoHeroPath = path;
-            autoFetchLogos();
-        });
-    });
-}
+    initAutoDownload(gameName, assetsPath, apiKey);
+    Q_EMIT autoDownloadProgress(tr("Searching…"));
 
-void SteamGridDB::autoFetchLogos()
-{
-    Q_EMIT autoDownloadProgress(tr("Downloading logo…"));
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/logos/game/%1").arg(m_autoGameId));
+    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/search/autocomplete/%1").arg(QString::fromUtf8(QUrl::toPercentEncoding(gameName))));
     autoMakeRequest(url, [this](const QJsonArray &data) {
         if (data.isEmpty()) {
             autoFinish();
             return;
         }
-        QString imgUrl = data.first().toObject().value(QStringLiteral("url")).toString();
-        autoDownloadFile(imgUrl, QStringLiteral("logo"), [this](const QString &path) {
-            m_autoLogoPath = path;
-            autoFinish();
-        });
+        m_autoGameId = data.first().toObject().value(QStringLiteral("id")).toInt();
+        autoRunStep(0);
     });
 }
 
@@ -410,20 +299,55 @@ void SteamGridDB::autoDownloadAllById(int gameId, const QString &gameName, const
     if (m_autoBusy || gameId <= 0)
         return;
 
-    m_autoBusy = true;
-    Q_EMIT autoDownloadingChanged();
-
-    m_autoApiKey = apiKey;
-    m_autoAssetsPath = assetsPath;
-    m_autoSafeName = QString(gameName).replace(QRegularExpression(QStringLiteral("[^a-zA-Z0-9_-]")), QStringLiteral("_")).toLower();
+    initAutoDownload(gameName, assetsPath, apiKey);
     m_autoGameId = gameId;
-    m_autoIconPath.clear();
-    m_autoGridPath.clear();
-    m_autoHeroPath.clear();
-    m_autoLogoPath.clear();
-
     Q_EMIT autoDownloadProgress(tr("Downloading…"));
-    autoFetchIcons();
+    autoRunStep(0);
+}
+
+void SteamGridDB::autoRunStep(int step)
+{
+    struct Step {
+        const char *artType;
+        const char *urlPath;
+        const char *suffix;
+        const char *query; // nullptr = no query string
+        QString SteamGridDB::*member;
+    };
+    static const Step steps[] = {
+        {"icon", "icons", "icon", "dimensions=64,128,256,512&mimes=image/png", &SteamGridDB::m_autoIconPath},
+        {"grid", "grids", "grid", nullptr, &SteamGridDB::m_autoGridPath},
+        {"hero", "heroes", "hero", nullptr, &SteamGridDB::m_autoHeroPath},
+        {"logo", "logos", "logo", nullptr, &SteamGridDB::m_autoLogoPath},
+    };
+    constexpr int kStepCount = static_cast<int>(std::size(steps));
+
+    if (step >= kStepCount) {
+        autoFinish();
+        return;
+    }
+
+    const auto &s = steps[step];
+    Q_EMIT autoDownloadProgress(tr("Downloading %1…").arg(QLatin1String(s.artType)));
+
+    auto urlStr = QStringLiteral("https://www.steamgriddb.com/api/v2/%1/game/%2").arg(QLatin1String(s.urlPath), QString::number(m_autoGameId));
+    if (s.query)
+        urlStr += QLatin1Char('?') + QLatin1String(s.query);
+
+    auto member = s.member;
+    auto suffix = QString::fromLatin1(s.suffix);
+
+    autoMakeRequest(QUrl(urlStr), [this, step, member, suffix](const QJsonArray &data) {
+        if (data.isEmpty()) {
+            autoRunStep(step + 1);
+            return;
+        }
+        QString imgUrl = data.first().toObject().value(QStringLiteral("url")).toString();
+        autoDownloadFile(imgUrl, suffix, [this, step, member](const QString &path) {
+            this->*member = path;
+            autoRunStep(step + 1);
+        });
+    });
 }
 
 void SteamGridDB::autoFinish()

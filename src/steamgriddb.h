@@ -50,13 +50,17 @@ private:
     void setBusy(bool busy);
     void setStatusText(const QString &text);
     void makeRequest(const QUrl &url, const QString &apiKey, const std::function<void(const QJsonArray &)> &callback);
+    void fetchArt(int gameId,
+                  const QString &apiKey,
+                  const QString &type,
+                  const QString &query,
+                  const QString &status,
+                  std::function<void(const QVariantList &)> emitSignal);
 
     void autoMakeRequest(const QUrl &url, std::function<void(const QJsonArray &)> onSuccess);
     void autoDownloadFile(const QString &imgUrl, const QString &suffix, std::function<void(const QString &)> onDone);
-    void autoFetchIcons();
-    void autoFetchGrids();
-    void autoFetchHeroes();
-    void autoFetchLogos();
+    void initAutoDownload(const QString &gameName, const QString &assetsPath, const QString &apiKey);
+    void autoRunStep(int step);
     void autoFinish();
 
     QNetworkAccessManager m_nam;
