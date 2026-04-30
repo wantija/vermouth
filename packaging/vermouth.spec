@@ -1,5 +1,5 @@
 Name:           vermouth
-Version:        1.4.1
+Version:        1.5.1
 Release:        1%{?dist}
 Summary:        A no-frills Wine/Proton game launcher for KDE
 License:        MIT
@@ -73,6 +73,8 @@ lets you run Windows executables through Proton or Wine on KDE.
 %{_datadir}/locale/*/LC_MESSAGES/vermouth.mo
 
 %changelog
+* Thu Apr 30 2026 Dejan Noveski <deko@duck.com> - 1.5.1-1
+- SteamGridDB integration, fixes
 * Mon Apr 27 2026 Dejan Noveski <deko@duck.com> - 1.4.1-1
 - Launch native apps
 * Sat Apr 25 2026 Dejan Noveski <deko@duck.com> - 1.3.5-1

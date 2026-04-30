@@ -155,6 +155,9 @@ void GamepadHandler::pollEvents()
             case SDL_CONTROLLER_BUTTON_START:
                 Q_EMIT startPressed();
                 break;
+            case SDL_CONTROLLER_BUTTON_GUIDE:
+                Q_EMIT guidePressed();
+                break;
             case SDL_CONTROLLER_BUTTON_DPAD_UP:
                 Q_EMIT dpadUp();
                 break;

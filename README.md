@@ -17,10 +17,10 @@ Point it at Windows executables and run them with Proton or Wine.</p>
 
 <p align="center">
   <img src="assets/screen1.png?t=1.41" alt="Vermouth screenshot" width="400">
-  <img src="assets/screen2.png?t=1.41" alt="Vermouth screenshot" width="400"><br>
+  <img src="assets/screen2.png?t=1.5" alt="Vermouth screenshot" width="400"><br>
   <img src="assets/screen3.png?t=1.3" alt="Vermouth screenshot" width="400">
   <img src="assets/screen4.png?t=1.3" alt="Vermouth screenshot" width="400"><br>
-  <img src="assets/screen6.png?t=1.4" alt="Vermouth screenshot" width="800">
+  <img src="assets/screen6.png?t=1.5" alt="Vermouth screenshot" width="800">
 </p>
 
 ## What it does
@@ -45,13 +45,20 @@ Additionally:
 - You can prevent the system from sleeping while a game is running
 - HDR can be toggled per-session on KDE - enabling it also sets the required Proton environment variables automatically
 - Big screen mode (beta), gamepad navigation
+- Integration with SteamGridDB for better icons, grid or hero images and layouts
 - You can launch native binaries, desktop entries and appimages
+
 
 ### umu-launcher support
 
 Vermouth supports [umu-launcher](https://github.com/Open-Wine-Components/umu-launcher), which runs Proton through the full Steam Runtime (pressure-vessel). This significantly improves game compatibility - especially for games with video cutscenes, media codecs, or anti-cheat. It is strongly recommended.
 
 If `umu-run` is found in your `PATH` or configured in Settings, Vermouth will use it automatically for all Proton launches. You can also download it directly from Settings → umu-launcher.
+
+
+### SteamGridDB support
+
+Vermouth supports [SteamGridDB](https://www.steamgriddb.com) for fetching icons, grid and hero images and logos. You need an API key which you can get by registering an account with them and getting your API key [here](https://www.steamgriddb.com/profile/preferences/api)
 
 ## Installing
 

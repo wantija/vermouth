@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(vermouth VERSION 1.4.1 LANGUAGES CXX)
+project(vermouth VERSION 1.5.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -50,6 +50,7 @@ qt_add_executable(vermouth
     src/downloader.cpp
     src/singleinstance.cpp
     src/gamepadhandler.cpp
+    src/steamgriddb.cpp
     resources.qrc
 )
 
@@ -63,6 +64,7 @@ qt_add_qml_module(vermouth
         qml/AddAppDialog.qml
         qml/RunExeDialog.qml
         qml/SettingsDialog.qml
+        qml/SteamGridDBPickerDialog.qml
     NO_RESOURCE_TARGET_PATH
 )
 

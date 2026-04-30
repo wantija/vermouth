@@ -23,6 +23,7 @@ Q_SIGNALS:
     void yPressed();
     void selectPressed();
     void startPressed();
+    void guidePressed();
     void dpadUp();
     void dpadDown();
     void dpadLeft();

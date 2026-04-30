@@ -139,6 +139,13 @@ QString ProtonScanner::localProtonPath() const
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/protons");
 }
 
+QString ProtonScanner::localAssetsPath() const
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/assets");
+    QDir().mkpath(path);
+    return path;
+}
+
 void ProtonScanner::setExtraProtonPaths(const QStringList &paths)
 {
     m_extraProtonPaths = paths;

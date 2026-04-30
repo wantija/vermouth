@@ -19,6 +19,8 @@ class SettingsManager : public QObject
     Q_PROPERTY(bool lightsOut READ lightsOut WRITE setLightsOut NOTIFY lightsOutChanged)
     Q_PROPERTY(QString lightsOutColor READ lightsOutColor WRITE setLightsOutColor NOTIFY lightsOutColorChanged)
     Q_PROPERTY(bool bigPicture READ bigPicture WRITE setBigPicture NOTIFY bigPictureChanged)
+    Q_PROPERTY(QString steamGridDbApiKey READ steamGridDbApiKey WRITE setSteamGridDbApiKey NOTIFY steamGridDbApiKeyChanged)
+    Q_PROPERTY(bool autoDownloadArt READ autoDownloadArt WRITE setAutoDownloadArt NOTIFY autoDownloadArtChanged)
 
 public:
     explicit SettingsManager(QObject *parent = nullptr);
@@ -62,6 +64,12 @@ public:
     bool bigPicture() const;
     Q_INVOKABLE void setBigPicture(bool enabled);
 
+    QString steamGridDbApiKey() const;
+    Q_INVOKABLE void setSteamGridDbApiKey(const QString &key);
+
+    bool autoDownloadArt() const;
+    Q_INVOKABLE void setAutoDownloadArt(bool enabled);
+
 Q_SIGNALS:
     void defaultPrefixDirChanged();
     void defaultGamePrefixChanged();
@@ -73,6 +81,8 @@ Q_SIGNALS:
     void lightsOutChanged();
     void lightsOutColorChanged();
     void bigPictureChanged();
+    void steamGridDbApiKeyChanged();
+    void autoDownloadArtChanged();
 
 private:
     QSettings m_settings;

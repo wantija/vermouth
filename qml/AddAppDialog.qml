@@ -33,6 +33,10 @@ Kirigami.Dialog {
     property bool editMode: false
     property int editIndex: -1
     property string prefixBasePath
+    property string autoDownloadTargetId: ""
+    property bool pendingAutoDownload: false
+    property bool autoDownloadingInDialog: false
+    property string autoDownloadStatus: ""
 
     function openForNew() {
         editMode = false;
@@ -44,6 +48,14 @@ Kirigami.Dialog {
         launchOptionsField.text = "";
         enableLoggingCheck.checked = false;
         iconField.text = "";
+        gridField.text = "";
+        heroField.text = "";
+        logoField.text = "";
+        steamGridDbIdField.text = "";
+        artSection.expanded = false;
+        pendingAutoDownload = false;
+        autoDownloadingInDialog = false;
+        autoDownloadStatus = "";
         runtimePicker.reset();
         prefixBasePath = protonScanner.prefixBasePath();
         dialog.open();
@@ -104,7 +116,15 @@ Kirigami.Dialog {
         launchOptionsField.text = app.launchOptions;
         enableLoggingCheck.checked = app.enableLogging;
         iconField.text = app.iconPath;
+        gridField.text = app.gridPath || "";
+        heroField.text = app.heroPath || "";
+        logoField.text = app.logoPath || "";
+        steamGridDbIdField.text = app.steamGridDbId > 0 ? app.steamGridDbId.toString() : "";
+        artSection.expanded = gridField.text !== "" || heroField.text !== "" || logoField.text !== "";
         prefixBasePath = protonScanner.prefixBasePath();
+        pendingAutoDownload = false;
+        autoDownloadingInDialog = false;
+        autoDownloadStatus = "";
         runtimePicker.loadFromApp(app);
         dialog.open();
     }
@@ -139,11 +159,22 @@ Kirigami.Dialog {
         var protonPath = runtimePicker.protonPath;
         var protonPrefix = protonPrefixField.text.trim() !== "" ? protonPrefixField.text : resolvePrefix();
         var winePrefix = winePrefixField.text.trim() !== "" ? winePrefixField.text : resolvePrefix();
+        var sgdbId = parseInt(steamGridDbIdField.text);
+        if (isNaN(sgdbId) || sgdbId < 0)
+            sgdbId = 0;
 
         if (editMode) {
-            appModel.editApp(editIndex, nameField.text, exeField.text, rt, protonPath, protonPrefix, runtimePicker.wineBinary, winePrefix, iconField.text, launchOptionsField.text, enableLoggingCheck.checked);
+            appModel.editApp(editIndex, nameField.text, exeField.text, rt, protonPath, protonPrefix, runtimePicker.wineBinary, winePrefix, iconField.text, gridField.text, heroField.text, launchOptionsField.text, enableLoggingCheck.checked, logoField.text, sgdbId);
         } else {
-            appModel.addApp(nameField.text, exeField.text, rt, protonPath, protonPrefix, runtimePicker.wineBinary, winePrefix, iconField.text, launchOptionsField.text, enableLoggingCheck.checked);
+            appModel.addApp(nameField.text, exeField.text, rt, protonPath, protonPrefix, runtimePicker.wineBinary, winePrefix, iconField.text, gridField.text, heroField.text, launchOptionsField.text, enableLoggingCheck.checked, logoField.text, sgdbId);
+        }
+
+        if (!editMode && settingsManager.autoDownloadArt && settingsManager.steamGridDbApiKey !== "") {
+            var saved = appModel.getAppByExePath(exeField.text);
+            if (saved.id) {
+                autoDownloadTargetId = saved.id;
+                steamGridDb.autoDownloadAll(nameField.text, protonScanner.localAssetsPath(), settingsManager.steamGridDbApiKey);
+            }
         }
     }
 
@@ -187,6 +218,53 @@ Kirigami.Dialog {
             }
 
             RowLayout {
+                Kirigami.FormData.label: i18n("SteamGridDB ID:")
+                QQC2.TextField {
+                    id: steamGridDbIdField
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 8
+                    placeholderText: i18n("optional")
+                    inputMethodHints: Qt.ImhDigitsOnly
+                    validator: IntValidator {
+                        bottom: 1
+                    }
+                }
+                QQC2.Button {
+                    icon.name: "search"
+                    enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy && !steamGridDb.autoDownloading
+                    QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Search SteamGridDB to set the ID")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    onClicked: steamGridDbPicker.openPickerForId(nameField.text, settingsManager.steamGridDbApiKey)
+                }
+                QQC2.Button {
+                    icon.name: "download"
+                    enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.autoDownloading && !steamGridDb.busy
+                    QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Auto-download all art from SteamGridDB")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    onClicked: {
+                        var storedId = parseInt(steamGridDbIdField.text);
+                        if (!isNaN(storedId) && storedId > 0) {
+                            dialog.autoDownloadingInDialog = true;
+                            dialog.autoDownloadStatus = "";
+                            steamGridDb.autoDownloadAllById(storedId, nameField.text, protonScanner.localAssetsPath(), settingsManager.steamGridDbApiKey);
+                        } else {
+                            dialog.pendingAutoDownload = true;
+                            steamGridDbPicker.openPickerForId(nameField.text, settingsManager.steamGridDbApiKey);
+                        }
+                    }
+                }
+            }
+
+            QQC2.Label {
+                visible: dialog.autoDownloadStatus !== "" || steamGridDb.autoDownloading && dialog.autoDownloadingInDialog
+                text: steamGridDb.autoDownloading && dialog.autoDownloadingInDialog ? steamGridDb.statusText : dialog.autoDownloadStatus
+                opacity: 0.75
+                font.italic: true
+                Kirigami.FormData.label: ""
+            }
+
+            RowLayout {
                 Kirigami.FormData.label: i18n("Icon (optional):")
                 QQC2.TextField {
                     id: iconField
@@ -196,6 +274,117 @@ Kirigami.Dialog {
                 QQC2.Button {
                     icon.name: "document-open"
                     onClicked: iconFileDialog.open()
+                }
+                QQC2.Button {
+                    icon.name: "download"
+                    enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy
+                    QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Download icon from SteamGridDB")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    onClicked: {
+                        var storedId = parseInt(steamGridDbIdField.text);
+                        if (!isNaN(storedId) && storedId > 0)
+                            steamGridDbPicker.openPickerWithId(storedId, nameField.text, "icon", settingsManager.steamGridDbApiKey, "icon");
+                        else
+                            steamGridDbPicker.openPicker(nameField.text, "icon", settingsManager.steamGridDbApiKey, "icon");
+                    }
+                }
+            }
+
+            QQC2.Button {
+                Kirigami.FormData.label: ""
+                text: artSection.expanded ? i18n("Hide Grid / Hero / Logo Art") : i18n("Show Grid / Hero / Logo Art")
+                icon.name: artSection.expanded ? "arrow-up" : "arrow-down"
+                flat: true
+                onClicked: artSection.expanded = !artSection.expanded
+            }
+
+            ColumnLayout {
+                id: artSection
+                property bool expanded: false
+                visible: expanded
+                Layout.fillWidth: true
+                spacing: Kirigami.Units.mediumSpacing
+
+                RowLayout {
+                    Kirigami.FormData.label: i18n("Grid (optional):")
+                    QQC2.TextField {
+                        id: gridField
+                        Layout.fillWidth: true
+                        placeholderText: "/path/to/grid.png"
+                    }
+                    QQC2.Button {
+                        icon.name: "document-open"
+                        onClicked: gridFileDialog.open()
+                    }
+                    QQC2.Button {
+                        icon.name: "download"
+                        enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy
+                        QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Download grid from SteamGridDB")
+                        QQC2.ToolTip.visible: hovered
+                        QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                        onClicked: {
+                            var storedId = parseInt(steamGridDbIdField.text);
+                            if (!isNaN(storedId) && storedId > 0)
+                                steamGridDbPicker.openPickerWithId(storedId, nameField.text, "grid", settingsManager.steamGridDbApiKey, "grid");
+                            else
+                                steamGridDbPicker.openPicker(nameField.text, "grid", settingsManager.steamGridDbApiKey, "grid");
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Kirigami.FormData.label: i18n("Hero (optional):")
+                    QQC2.TextField {
+                        id: heroField
+                        Layout.fillWidth: true
+                        placeholderText: "/path/to/hero.png"
+                    }
+                    QQC2.Button {
+                        icon.name: "document-open"
+                        onClicked: heroFileDialog.open()
+                    }
+                    QQC2.Button {
+                        icon.name: "download"
+                        enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy
+                        QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Download hero from SteamGridDB")
+                        QQC2.ToolTip.visible: hovered
+                        QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                        onClicked: {
+                            var storedId = parseInt(steamGridDbIdField.text);
+                            if (!isNaN(storedId) && storedId > 0)
+                                steamGridDbPicker.openPickerWithId(storedId, nameField.text, "hero", settingsManager.steamGridDbApiKey, "hero");
+                            else
+                                steamGridDbPicker.openPicker(nameField.text, "hero", settingsManager.steamGridDbApiKey, "hero");
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Kirigami.FormData.label: i18n("Logo (optional):")
+                    QQC2.TextField {
+                        id: logoField
+                        Layout.fillWidth: true
+                        placeholderText: "/path/to/logo.png"
+                    }
+                    QQC2.Button {
+                        icon.name: "document-open"
+                        onClicked: logoFileDialog.open()
+                    }
+                    QQC2.Button {
+                        icon.name: "download"
+                        enabled: nameField.text !== "" && settingsManager.steamGridDbApiKey !== "" && !steamGridDb.busy
+                        QQC2.ToolTip.text: settingsManager.steamGridDbApiKey === "" ? i18n("Set SteamGridDB API key in Settings") : i18n("Download logo from SteamGridDB")
+                        QQC2.ToolTip.visible: hovered
+                        QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                        onClicked: {
+                            var storedId = parseInt(steamGridDbIdField.text);
+                            if (!isNaN(storedId) && storedId > 0)
+                                steamGridDbPicker.openPickerWithId(storedId, nameField.text, "logo", settingsManager.steamGridDbApiKey, "logo");
+                            else
+                                steamGridDbPicker.openPicker(nameField.text, "logo", settingsManager.steamGridDbApiKey, "logo");
+                        }
+                    }
                 }
             }
         }
@@ -296,5 +485,85 @@ Kirigami.Dialog {
         title: i18n("Select Wine Prefix Folder")
         currentFolder: "file://" + dialog.prefixBasePath
         onAccepted: winePrefixField.text = decodeURIComponent(selectedFolder.toString().replace("file://", ""))
+    }
+
+    FileDialog {
+        id: gridFileDialog
+        title: i18n("Select Grid Image")
+        currentFolder: "file://" + protonScanner.homePath()
+        nameFilters: [i18n("Images (*.png *.jpg *.jpeg *.webp)"), i18n("All files (*)")]
+        onAccepted: gridField.text = decodeURIComponent(selectedFile.toString().replace("file://", ""))
+    }
+
+    FileDialog {
+        id: heroFileDialog
+        title: i18n("Select Hero Image")
+        currentFolder: "file://" + protonScanner.homePath()
+        nameFilters: [i18n("Images (*.png *.jpg *.jpeg *.webp)"), i18n("All files (*)")]
+        onAccepted: heroField.text = decodeURIComponent(selectedFile.toString().replace("file://", ""))
+    }
+
+    FileDialog {
+        id: logoFileDialog
+        title: i18n("Select Logo Image")
+        currentFolder: "file://" + protonScanner.homePath()
+        nameFilters: [i18n("Images (*.png *.jpg *.jpeg *.webp)"), i18n("All files (*)")]
+        onAccepted: logoField.text = decodeURIComponent(selectedFile.toString().replace("file://", ""))
+    }
+
+    SteamGridDBPickerDialog {
+        id: steamGridDbPicker
+        onArtSelected: function (path) {
+            if (steamGridDbPicker.targetField === "icon")
+                iconField.text = path;
+            else if (steamGridDbPicker.targetField === "grid")
+                gridField.text = path;
+            else if (steamGridDbPicker.targetField === "hero")
+                heroField.text = path;
+            else if (steamGridDbPicker.targetField === "logo")
+                logoField.text = path;
+        }
+        onGameIdFound: function (id) {
+            steamGridDbIdField.text = id.toString();
+            if (dialog.pendingAutoDownload) {
+                dialog.pendingAutoDownload = false;
+                dialog.autoDownloadingInDialog = true;
+                dialog.autoDownloadStatus = "";
+                steamGridDb.autoDownloadAllById(id, nameField.text, protonScanner.localAssetsPath(), settingsManager.steamGridDbApiKey);
+            }
+        }
+    }
+
+    Connections {
+        target: steamGridDb
+        function onAutoDownloadFinished(gameId, iconPath, gridPath, heroPath, logoPath) {
+            if (dialog.autoDownloadTargetId !== "") {
+                appModel.updateAppArt(dialog.autoDownloadTargetId, iconPath, gridPath, heroPath, logoPath, gameId);
+                dialog.autoDownloadTargetId = "";
+            } else if (dialog.autoDownloadingInDialog) {
+                dialog.autoDownloadingInDialog = false;
+                dialog.autoDownloadStatus = i18n("Art downloaded!");
+                if (iconPath !== "")
+                    iconField.text = iconPath;
+                if (gridPath !== "") {
+                    gridField.text = gridPath;
+                    artSection.expanded = true;
+                }
+                if (heroPath !== "") {
+                    heroField.text = heroPath;
+                    artSection.expanded = true;
+                }
+                if (logoPath !== "") {
+                    logoField.text = logoPath;
+                    artSection.expanded = true;
+                }
+                if (gameId > 0)
+                    steamGridDbIdField.text = gameId.toString();
+            }
+        }
+        function onAutoDownloadProgress(step) {
+            if (dialog.autoDownloadingInDialog)
+                dialog.autoDownloadStatus = step;
+        }
     }
 }

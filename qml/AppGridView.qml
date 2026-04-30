@@ -9,14 +9,26 @@ GridView {
     model: appModel
     property real scaleFactor: 1.0
     property bool lightsOut: false
+    property string viewType: "icon"
+    property bool showNames: true
 
     Settings {
         id: viewSettings
         category: "GridView"
         property alias scaleFactor: gridView.scaleFactor
+        property alias viewType: gridView.viewType
+        property alias showNames: gridView.showNames
     }
-    cellWidth: 140 * scaleFactor
-    cellHeight: 160 * scaleFactor
+
+    cellWidth: viewType === "hero" ? 300 * scaleFactor : viewType === "grid" ? 155 * scaleFactor : 140 * scaleFactor
+    cellHeight: {
+        if (viewType === "hero")
+            return (showNames ? 140 : 116) * scaleFactor;
+        if (viewType === "grid")
+            return (showNames ? 250 : 232) * scaleFactor;
+        return (showNames ? 160 : 120) * scaleFactor;
+    }
+
     clip: true
     focus: true
     keyNavigationEnabled: true
@@ -69,6 +81,9 @@ GridView {
         required property string wineBinary
         required property string winePrefix
         required property string iconPath
+        required property string gridPath
+        required property string heroPath
+        required property string logoPath
         required property string launchOptions
         required property bool enableLogging
 
@@ -80,21 +95,7 @@ GridView {
             anchors.margins: Kirigami.Units.smallSpacing
             radius: Kirigami.Units.cornerRadius
             color: "transparent"
-            border.color: delegateRoot.isSelected ? Kirigami.Theme.highlightColor : mouseArea.containsMouse ? Qt.darker(Kirigami.Theme.highlightColor, 1.5) : "transparent"
-            border.width: delegateRoot.isSelected ? 2 : mouseArea.containsMouse ? 1 : 0
-
-            Behavior on border.color {
-                ColorAnimation {
-                    duration: 150
-                    easing.type: Easing.OutCubic
-                }
-            }
-            Behavior on border.width {
-                NumberAnimation {
-                    duration: 150
-                    easing.type: Easing.OutCubic
-                }
-            }
+            layer.enabled: gridView.viewType !== "icon"
 
             SequentialAnimation {
                 id: launchAnim
@@ -114,39 +115,20 @@ GridView {
                 }
             }
 
-            Rectangle {
-                id: launchFlash
-                anchors.fill: parent
-                radius: Kirigami.Units.cornerRadius
-                color: Kirigami.Theme.highlightColor
-                opacity: 0
-                z: 10
-
-                SequentialAnimation {
-                    id: flashAnim
-                    NumberAnimation {
-                        target: launchFlash
-                        property: "opacity"
-                        to: 0.3
-                        duration: 80
-                    }
-                    NumberAnimation {
-                        target: launchFlash
-                        property: "opacity"
-                        to: 0
-                        duration: 300
-                        easing.type: Easing.OutCubic
-                    }
-                }
-            }
-
+            // ── Icon mode ────────────────────────────────────────────────────
             ColumnLayout {
+                visible: gridView.viewType === "icon"
                 anchors.fill: parent
                 anchors.margins: Kirigami.Units.smallSpacing + 2
                 spacing: Kirigami.Units.smallSpacing
 
+                Item {
+                    Layout.fillHeight: true
+                    visible: !gridView.showNames
+                }
+
                 Rectangle {
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: 80 * gridView.scaleFactor
                     Layout.preferredHeight: 80 * gridView.scaleFactor
                     radius: Kirigami.Units.cornerRadius
@@ -178,8 +160,14 @@ GridView {
                     }
                 }
 
+                Item {
+                    Layout.fillHeight: true
+                    visible: !gridView.showNames
+                }
+
                 QQC2.Label {
                     text: delegateRoot.name
+                    visible: gridView.showNames
                     color: gridView.lightsOut ? "#ffffff" : Kirigami.Theme.textColor
                     font.pixelSize: 12 * gridView.scaleFactor
                     font.bold: true
@@ -193,12 +181,153 @@ GridView {
                 }
             }
 
+            // ── Grid / Hero mode ─────────────────────────────────────────────
+            Item {
+                visible: gridView.viewType !== "icon"
+                anchors.fill: parent
+
+                // Background art image
+                Image {
+                    id: artImage
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    source: {
+                        var p = gridView.viewType === "hero" ? delegateRoot.heroPath : delegateRoot.gridPath;
+                        return p !== "" ? "file://" + p : "";
+                    }
+                    visible: source !== ""
+                }
+
+                // Fallback placeholder when no art
+                Rectangle {
+                    anchors.fill: parent
+                    visible: artImage.source === ""
+                    color: Kirigami.Theme.alternateBackgroundColor
+
+                    Image {
+                        anchors.centerIn: parent
+                        width: 48 * gridView.scaleFactor
+                        height: 48 * gridView.scaleFactor
+                        source: {
+                            if (delegateRoot.iconPath === "")
+                                return "";
+                            if (delegateRoot.iconPath.startsWith("/"))
+                                return "file://" + delegateRoot.iconPath;
+                            return "image://icon/" + delegateRoot.iconPath;
+                        }
+                        visible: delegateRoot.iconPath !== ""
+                        fillMode: Image.PreserveAspectFit
+                        sourceSize: Qt.size(96, 96)
+                    }
+                    QQC2.Label {
+                        anchors.centerIn: parent
+                        visible: delegateRoot.iconPath === ""
+                        text: delegateRoot.name.charAt(0).toUpperCase()
+                        font.pixelSize: 28 * gridView.scaleFactor
+                        font.bold: true
+                        color: Kirigami.Theme.highlightColor
+                    }
+                }
+
+                // Logo overlay — hero mode only, when hero art is present
+                Image {
+                    visible: gridView.viewType === "hero" && delegateRoot.logoPath !== "" && artImage.source !== ""
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.bottom: artNameOverlay.visible ? artNameOverlay.top : parent.bottom
+                    anchors.margins: Kirigami.Units.smallSpacing * 2
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    source: delegateRoot.logoPath !== "" ? "file://" + delegateRoot.logoPath : ""
+                }
+
+                // Name overlay at bottom
+                Rectangle {
+                    id: artNameOverlay
+                    visible: gridView.showNames
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: artNameLabel.implicitHeight + Kirigami.Units.smallSpacing * 2
+                    color: Qt.rgba(0, 0, 0, 0.65)
+
+                    QQC2.Label {
+                        id: artNameLabel
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.margins: Kirigami.Units.smallSpacing
+                        text: delegateRoot.name
+                        color: "#ffffff"
+                        font.pixelSize: 11 * gridView.scaleFactor
+                        font.bold: true
+                        elide: Text.ElideRight
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                    }
+                }
+            }
+
+            // ── Selection / hover border (above art in all modes) ────────────
+            Rectangle {
+                anchors.fill: parent
+                radius: Kirigami.Units.cornerRadius
+                color: "transparent"
+                border.color: delegateRoot.isSelected ? Kirigami.Theme.highlightColor : mouseArea.containsMouse ? Qt.darker(Kirigami.Theme.highlightColor, 1.5) : "transparent"
+                border.width: delegateRoot.isSelected ? 2 : mouseArea.containsMouse ? 1 : 0
+                z: 5
+
+                Behavior on border.color {
+                    ColorAnimation {
+                        duration: 150
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on border.width {
+                    NumberAnimation {
+                        duration: 150
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            // ── Launch flash ─────────────────────────────────────────────────
+            Rectangle {
+                id: launchFlash
+                anchors.fill: parent
+                radius: Kirigami.Units.cornerRadius
+                color: Kirigami.Theme.highlightColor
+                opacity: 0
+                z: 10
+
+                SequentialAnimation {
+                    id: flashAnim
+                    NumberAnimation {
+                        target: launchFlash
+                        property: "opacity"
+                        to: 0.3
+                        duration: 80
+                    }
+                    NumberAnimation {
+                        target: launchFlash
+                        property: "opacity"
+                        to: 0
+                        duration: 300
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
             MouseArea {
                 id: mouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 cursorShape: Qt.PointingHandCursor
+                z: 20
 
                 onDoubleClicked: function (mouse) {
                     if (mouse.button === Qt.LeftButton && !Qt.styleHints.singleClickActivation) {
@@ -285,7 +414,7 @@ GridView {
             QQC2.Menu {
                 enabled: delegateRoot.runtimeType !== "native"
                 title: i18n("&Wine Utilities")
-                icon.name: "wine" // fallback icon
+                icon.name: "wine"
 
                 QQC2.MenuItem {
                     text: i18n("Run Winecfg")

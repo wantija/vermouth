@@ -7,6 +7,7 @@
 #include "protonscanner.h"
 #include "settingsmanager.h"
 #include "singleinstance.h"
+#include "steamgriddb.h"
 #include "umudownloader.h"
 #include <KAboutData>
 #include <KLocalizedContext>
@@ -162,6 +163,8 @@ int main(int argc, char *argv[])
     UmuDownloader umuDownloader;
     umuDownloader.setInstallPath(protonScanner.localProtonPath() + QStringLiteral("/umu"));
 
+    SteamGridDB steamGridDb;
+
     launcher.setUmuPath(settingsManager.umuPath());
     QObject::connect(&settingsManager, &SettingsManager::umuPathChanged, [&]() {
         launcher.setUmuPath(settingsManager.umuPath());
@@ -200,6 +203,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("settingsManager"), &settingsManager);
     engine.rootContext()->setContextProperty(QStringLiteral("protonDownloader"), &protonDownloader);
     engine.rootContext()->setContextProperty(QStringLiteral("umuDownloader"), &umuDownloader);
+    engine.rootContext()->setContextProperty(QStringLiteral("steamGridDb"), &steamGridDb);
     engine.rootContext()->setContextProperty(QStringLiteral("singleInstance"), &singleInstance);
     engine.rootContext()->setContextProperty(QStringLiteral("gamepadHandler"), &gamepadHandler);
     engine.rootContext()->setContextProperty(QStringLiteral("openExePath"), openExePath);
