@@ -156,7 +156,7 @@ void SteamGridDB::fetchIcons(int gameId, const QString &apiKey)
     setBusy(true);
     setStatusText(tr("Fetching icons…"));
 
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/icons/game/%1").arg(gameId));
+    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/icons/game/%1?dimensions=128,256,512").arg(gameId));
     makeRequest(url, apiKey, [this](const QJsonArray &data) {
         QVariantList items;
         for (const auto &val : data) {
@@ -340,7 +340,7 @@ void SteamGridDB::autoDownloadFile(const QString &imgUrl, const QString &suffix,
 void SteamGridDB::autoFetchIcons()
 {
     Q_EMIT autoDownloadProgress(tr("Downloading icon…"));
-    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/icons/game/%1").arg(m_autoGameId));
+    QUrl url(QStringLiteral("https://www.steamgriddb.com/api/v2/icons/game/%1?dimensions=128,256,512").arg(m_autoGameId));
     autoMakeRequest(url, [this](const QJsonArray &data) {
         if (data.isEmpty()) {
             autoFetchGrids();

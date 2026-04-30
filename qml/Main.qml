@@ -255,19 +255,7 @@ Kirigami.ApplicationWindow {
             contentItem: RowLayout {
                 QQC2.Label {
                     id: footerStatusText
-                    text: {
-                        if (gridView.currentIndex < 0)
-                            return "";
-                        var app = appModel.getApp(gridView.currentIndex);
-                        var runner;
-                        if (app.runtimeType === "proton")
-                            runner = app.protonPath.split("/").pop();
-                        else if (app.runtimeType === "wine")
-                            runner = app.wineBinary;
-                        else
-                            runner = "Native";
-                        return i18n("%1 - %2", runner, app.exePath);
-                    }
+                    text: ""
                     color: root.lightsOut ? root.loText : Kirigami.Theme.textColor
                     elide: Text.ElideMiddle
                     Layout.fillWidth: true
@@ -435,6 +423,22 @@ Kirigami.ApplicationWindow {
             target.forceActiveFocus();
     }
 
+    function updateFooterStatus() {
+        if (gridView.currentIndex < 0) {
+            footerStatusText.text = "";
+            return;
+        }
+        var app = appModel.getApp(gridView.currentIndex);
+        var runner;
+        if (app.runtimeType === "proton")
+            runner = app.protonPath.split("/").pop();
+        else if (app.runtimeType === "wine")
+            runner = app.wineBinary;
+        else
+            runner = "Native";
+        footerStatusText.text = i18n("%1 - %2", runner, app.exePath);
+    }
+
     function openExe(path) {
         var existing = appModel.getAppByExePath(path);
         if (existing && existing.exePath !== undefined) {
@@ -567,9 +571,19 @@ Kirigami.ApplicationWindow {
     }
 
     Connections {
+        target: gridView
+        function onCurrentIndexChanged() {
+            root.updateFooterStatus();
+        }
+    }
+
+    Connections {
         target: steamGridDb
         function onAutoDownloadProgress(name) {
             footerStatusText.text = i18n("Auto downloading: %1", name);
+        }
+        function onAutoDownloadFinished() {
+            root.updateFooterStatus();
         }
     }
 }
