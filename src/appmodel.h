@@ -20,6 +20,10 @@ public:
         WineBinaryRole,
         WinePrefixRole,
         IconPathRole,
+        GridPathRole,
+        HeroPathRole,
+        LogoPathRole,
+        SteamGridDbIdRole,
         LaunchOptionsRole,
         EnableLoggingRole,
     };
@@ -43,8 +47,12 @@ public:
                             const QString &wineBinary,
                             const QString &winePrefix,
                             const QString &iconPath,
+                            const QString &gridPath = QString(),
+                            const QString &heroPath = QString(),
                             const QString &launchOptions = QString(),
-                            bool enableLogging = false);
+                            bool enableLogging = false,
+                            const QString &logoPath = QString(),
+                            int steamGridDbId = 0);
     Q_INVOKABLE void removeApp(int index);
     Q_INVOKABLE void removeAndCleanApp(int index);
     Q_INVOKABLE void editApp(int index,
@@ -56,12 +64,18 @@ public:
                              const QString &wineBinary,
                              const QString &winePrefix,
                              const QString &iconPath,
+                             const QString &gridPath = QString(),
+                             const QString &heroPath = QString(),
                              const QString &launchOptions = QString(),
-                             bool enableLogging = false);
+                             bool enableLogging = false,
+                             const QString &logoPath = QString(),
+                             int steamGridDbId = 0);
     Q_INVOKABLE QVariantMap getApp(int index) const;
     Q_INVOKABLE QVariantMap getAppById(const QString &id) const;
     Q_INVOKABLE QVariantMap getAppByExePath(const QString &exePath) const;
     Q_INVOKABLE void setFilterString(const QString &filter);
+    Q_INVOKABLE void
+    updateAppArt(const QString &id, const QString &iconPath, const QString &gridPath, const QString &heroPath, const QString &logoPath, int steamGridDbId = 0);
 
     void load();
     void save() const;

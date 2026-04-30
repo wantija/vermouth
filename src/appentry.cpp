@@ -14,6 +14,10 @@ QJsonObject AppEntry::toJson() const
     obj[QStringLiteral("wineBinary")] = wineBinary;
     obj[QStringLiteral("winePrefix")] = winePrefix;
     obj[QStringLiteral("iconPath")] = iconPath;
+    obj[QStringLiteral("gridPath")] = gridPath;
+    obj[QStringLiteral("heroPath")] = heroPath;
+    obj[QStringLiteral("logoPath")] = logoPath;
+    obj[QStringLiteral("steamGridDbId")] = steamGridDbId;
     obj[QStringLiteral("launchOptions")] = launchOptions;
     obj[QStringLiteral("enableLogging")] = enableLogging;
     return obj;
@@ -34,6 +38,10 @@ QVariantMap AppEntry::toVariantMap() const
         {QStringLiteral("wineBinary"), wineBinary},
         {QStringLiteral("winePrefix"), winePrefix},
         {QStringLiteral("iconPath"), iconPath},
+        {QStringLiteral("gridPath"), gridPath},
+        {QStringLiteral("heroPath"), heroPath},
+        {QStringLiteral("logoPath"), logoPath},
+        {QStringLiteral("steamGridDbId"), steamGridDbId},
         {QStringLiteral("launchOptions"), launchOptions},
         {QStringLiteral("enableLogging"), enableLogging},
     };
@@ -54,6 +62,10 @@ AppEntry AppEntry::fromJson(const QJsonObject &obj)
     e.wineBinary = obj[QStringLiteral("wineBinary")].toString();
     e.winePrefix = obj[QStringLiteral("winePrefix")].toString();
     e.iconPath = obj[QStringLiteral("iconPath")].toString();
+    e.gridPath = obj[QStringLiteral("gridPath")].toString();
+    e.heroPath = obj[QStringLiteral("heroPath")].toString();
+    e.logoPath = obj[QStringLiteral("logoPath")].toString();
+    e.steamGridDbId = obj[QStringLiteral("steamGridDbId")].toInt(0);
     e.launchOptions = obj[QStringLiteral("launchOptions")].toString();
     e.enableLogging = obj[QStringLiteral("enableLogging")].toBool(false);
     return e;

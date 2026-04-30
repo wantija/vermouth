@@ -174,3 +174,29 @@ void SettingsManager::setBigPicture(bool enabled)
     m_settings.setValue(QStringLiteral("bigPicture"), enabled);
     Q_EMIT bigPictureChanged();
 }
+
+QString SettingsManager::steamGridDbApiKey() const
+{
+    return m_settings.value(QStringLiteral("steamGridDbApiKey")).toString();
+}
+
+void SettingsManager::setSteamGridDbApiKey(const QString &key)
+{
+    if (steamGridDbApiKey() == key)
+        return;
+    m_settings.setValue(QStringLiteral("steamGridDbApiKey"), key);
+    Q_EMIT steamGridDbApiKeyChanged();
+}
+
+bool SettingsManager::autoDownloadArt() const
+{
+    return m_settings.value(QStringLiteral("autoDownloadArt"), false).toBool();
+}
+
+void SettingsManager::setAutoDownloadArt(bool enabled)
+{
+    if (autoDownloadArt() == enabled)
+        return;
+    m_settings.setValue(QStringLiteral("autoDownloadArt"), enabled);
+    Q_EMIT autoDownloadArtChanged();
+}

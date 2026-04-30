@@ -26,6 +26,7 @@ Kirigami.ApplicationWindow {
     readonly property color loAltBg: Qt.darker(loBase, 1.3)
     property double prevScaleFactor: 1
     property bool prevLightsOut: false
+    property string autoArtStatus: ""
 
     background: Rectangle {
         color: root.lightsOut ? "transparent" : Kirigami.Theme.backgroundColor
@@ -240,6 +241,7 @@ Kirigami.ApplicationWindow {
 
             contentItem: RowLayout {
                 QQC2.Label {
+                    id: footerStatusText
                     text: {
                         if (gridView.currentIndex < 0)
                             return "";
@@ -504,6 +506,13 @@ Kirigami.ApplicationWindow {
         function onPrefixNotReady(name) {
             prefixNotReadyDialog.appName = name;
             prefixNotReadyDialog.open();
+        }
+    }
+
+    Connections {
+        target: steamGridDb
+        function onAutoDownloadProgress(name) {
+            footerStatusText.text = i18n("Auto downloading: %1", name);
         }
     }
 }

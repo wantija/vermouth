@@ -28,6 +28,10 @@ public:
     QString winePrefix;
 
     QString iconPath;
+    QString gridPath;
+    QString heroPath;
+    QString logoPath;
+    int steamGridDbId = 0;
     QString launchOptions;
     bool enableLogging = false;
 

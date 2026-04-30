@@ -50,6 +50,7 @@ qt_add_executable(vermouth
     src/downloader.cpp
     src/singleinstance.cpp
     src/gamepadhandler.cpp
+    src/steamgriddb.cpp
     resources.qrc
 )
 
@@ -63,6 +64,7 @@ qt_add_qml_module(vermouth
         qml/AddAppDialog.qml
         qml/RunExeDialog.qml
         qml/SettingsDialog.qml
+        qml/SteamGridDBPickerDialog.qml
     NO_RESOURCE_TARGET_PATH
 )
 

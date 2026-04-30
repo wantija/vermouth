@@ -75,6 +75,14 @@ QVariant AppModel::data(const QModelIndex &index, int role) const
         return e.winePrefix;
     case IconPathRole:
         return e.iconPath;
+    case GridPathRole:
+        return e.gridPath;
+    case HeroPathRole:
+        return e.heroPath;
+    case LogoPathRole:
+        return e.logoPath;
+    case SteamGridDbIdRole:
+        return e.steamGridDbId;
     case LaunchOptionsRole:
         return e.launchOptions;
     case EnableLoggingRole:
@@ -95,6 +103,10 @@ QHash<int, QByteArray> AppModel::roleNames() const
         {WineBinaryRole, "wineBinary"},
         {WinePrefixRole, "winePrefix"},
         {IconPathRole, "iconPath"},
+        {GridPathRole, "gridPath"},
+        {HeroPathRole, "heroPath"},
+        {LogoPathRole, "logoPath"},
+        {SteamGridDbIdRole, "steamGridDbId"},
         {LaunchOptionsRole, "launchOptions"},
         {EnableLoggingRole, "enableLogging"},
     };
@@ -108,8 +120,12 @@ void AppModel::addApp(const QString &name,
                       const QString &wineBinary,
                       const QString &winePrefix,
                       const QString &iconPath,
+                      const QString &gridPath,
+                      const QString &heroPath,
                       const QString &launchOptions,
-                      bool enableLogging)
+                      bool enableLogging,
+                      const QString &logoPath,
+                      int steamGridDbId)
 {
     AppEntry e;
     e.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -121,6 +137,10 @@ void AppModel::addApp(const QString &name,
     e.wineBinary = wineBinary;
     e.winePrefix = winePrefix;
     e.iconPath = iconPath;
+    e.gridPath = gridPath;
+    e.heroPath = heroPath;
+    e.logoPath = logoPath;
+    e.steamGridDbId = steamGridDbId;
     e.launchOptions = launchOptions;
     e.enableLogging = enableLogging;
 
@@ -176,8 +196,12 @@ void AppModel::editApp(int index,
                        const QString &wineBinary,
                        const QString &winePrefix,
                        const QString &iconPath,
+                       const QString &gridPath,
+                       const QString &heroPath,
                        const QString &launchOptions,
-                       bool enableLogging)
+                       bool enableLogging,
+                       const QString &logoPath,
+                       int steamGridDbId)
 {
     int src = sourceIndex(index);
     if (src < 0)
@@ -192,6 +216,10 @@ void AppModel::editApp(int index,
     e.wineBinary = wineBinary;
     e.winePrefix = winePrefix;
     e.iconPath = iconPath;
+    e.gridPath = gridPath;
+    e.heroPath = heroPath;
+    e.logoPath = logoPath;
+    e.steamGridDbId = steamGridDbId;
     e.launchOptions = launchOptions;
     e.enableLogging = enableLogging;
 
@@ -200,6 +228,34 @@ void AppModel::editApp(int index,
     endResetModel();
     Q_EMIT countChanged();
     save();
+}
+
+void AppModel::updateAppArt(const QString &id,
+                            const QString &iconPath,
+                            const QString &gridPath,
+                            const QString &heroPath,
+                            const QString &logoPath,
+                            int steamGridDbId)
+{
+    for (int i = 0; i < m_entries.size(); ++i) {
+        if (m_entries[i].id == id) {
+            if (!iconPath.isEmpty())
+                m_entries[i].iconPath = iconPath;
+            if (!gridPath.isEmpty())
+                m_entries[i].gridPath = gridPath;
+            if (!heroPath.isEmpty())
+                m_entries[i].heroPath = heroPath;
+            if (!logoPath.isEmpty())
+                m_entries[i].logoPath = logoPath;
+            if (steamGridDbId > 0)
+                m_entries[i].steamGridDbId = steamGridDbId;
+            beginResetModel();
+            rebuildFilter();
+            endResetModel();
+            save();
+            return;
+        }
+    }
 }
 
 QVariantMap AppModel::getApp(int index) const

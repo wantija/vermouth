@@ -9,6 +9,7 @@
         <file>qml/RuntimePicker.qml</file>
         <file>qml/RunExeStandaloneDialog.qml</file>
         <file>qml/SettingsDialog.qml</file>
+        <file>qml/SteamGridDBPickerDialog.qml</file>
         <file>qml/Main.qml</file>
     </qresource>
 </RCC>

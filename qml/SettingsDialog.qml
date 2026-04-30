@@ -14,6 +14,7 @@ Kirigami.PromptDialog {
         settingsManager.setUmuPath(umuPathField.text);
         settingsManager.setDefaultPrefixDir(prefixDirField.text);
         settingsManager.setDefaultGamePrefix(gamePrefixField.text);
+        settingsManager.setSteamGridDbApiKey(steamGridDbKeyField.text);
         defaultRuntimePicker.saveToSettings();
         var vars = [];
         for (var i = 0; i < envModel.count; i++) {
@@ -29,6 +30,7 @@ Kirigami.PromptDialog {
         umuPathField.text = settingsManager.umuPath;
         prefixDirField.text = settingsManager.defaultPrefixDir;
         gamePrefixField.text = settingsManager.defaultGamePrefix;
+        steamGridDbKeyField.text = settingsManager.steamGridDbApiKey;
         pathsModel.clear();
         var paths = settingsManager.extraProtonPaths;
         for (var i = 0; i < paths.length; i++) {
@@ -234,6 +236,44 @@ Kirigami.PromptDialog {
                     QQC2.ToolTip.visible: hovered
                     QQC2.ToolTip.text: protonDownloader.statusText ? protonDownloader.statusText : i18n("Download latest GE Proton")
                     onClicked: protonDownloader.downloadLatest()
+                }
+            }
+
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: i18n("SteamGridDB")
+            }
+
+            QQC2.Label {
+                Kirigami.FormData.label: ""
+                text: i18n("SteamGridDB API key is required to download game art. You can get a free key from steamgriddb.com/profile/preferences")
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+                Layout.maximumWidth: Kirigami.Units.gridUnit * 26
+                font.italic: true
+                opacity: 0.8
+            }
+
+            QQC2.TextField {
+                id: steamGridDbKeyField
+                Kirigami.FormData.label: i18n("API Key:")
+                Layout.fillWidth: true
+                echoMode: TextInput.PasswordEchoOnEdit
+                placeholderText: i18n("Paste your SteamGridDB API key")
+            }
+
+            RowLayout {
+                Kirigami.FormData.label: i18n("Auto-download Art:")
+                QQC2.Switch {
+                    id: autoDownloadSwitch
+                    checked: settingsManager.autoDownloadArt
+                    onToggled: settingsManager.setAutoDownloadArt(checked)
+                }
+                QQC2.Label {
+                    text: i18n("Automatically download icon, grid, hero and logo when adding a game")
+                    wrapMode: Text.WordWrap
+                    font.italic: true
+                    opacity: 0.8
                 }
             }
 

@@ -69,6 +69,8 @@ GridView {
         required property string wineBinary
         required property string winePrefix
         required property string iconPath
+        required property string gridPath
+        required property string heroPath
         required property string launchOptions
         required property bool enableLogging
 
