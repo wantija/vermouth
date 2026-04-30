@@ -519,7 +519,7 @@ Kirigami.ApplicationWindow {
             gamepadHandler.sendKey(Qt.Key_Return);
         }
 
-        function onStartPressed() {
+        function onGuidePressed() {
             bigPictureAction.trigger();
         }
 
