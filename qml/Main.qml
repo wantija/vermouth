@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import QtQuick.Window
+import QtCore
 import org.kde.kirigami as Kirigami
 import com.dekomote.vermouth 1.0
 
@@ -27,6 +28,18 @@ Kirigami.ApplicationWindow {
     property double prevScaleFactor: 1
     property bool prevLightsOut: false
     property string autoArtStatus: ""
+
+    Settings {
+        id: windowSettings
+        category: "Window"
+        property int savedWidth: 800
+        property int savedHeight: 800
+    }
+
+    onWidthChanged: if (visibility === Window.Windowed)
+        windowSettings.savedWidth = width
+    onHeightChanged: if (visibility === Window.Windowed)
+        windowSettings.savedHeight = height
 
     background: Rectangle {
         color: root.lightsOut ? "transparent" : Kirigami.Theme.backgroundColor
@@ -278,6 +291,48 @@ Kirigami.ApplicationWindow {
                     QQC2.ToolTip.visible: hovered
                     QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
                 }
+                QQC2.ToolSeparator {}
+                QQC2.ToolButton {
+                    icon.name: "view-list-icons"
+                    flat: true
+                    highlighted: gridView.viewType === "icon"
+                    icon.color: root.lightsOut ? root.loText : (highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor)
+                    onClicked: gridView.viewType = "icon"
+                    QQC2.ToolTip.text: i18n("Icon view")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                }
+                QQC2.ToolButton {
+                    icon.name: "view-preview"
+                    flat: true
+                    highlighted: gridView.viewType === "grid"
+                    icon.color: root.lightsOut ? root.loText : (highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor)
+                    onClicked: gridView.viewType = "grid"
+                    QQC2.ToolTip.text: i18n("Cover art view")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                }
+                QQC2.ToolButton {
+                    icon.name: "image-x-generic"
+                    flat: true
+                    highlighted: gridView.viewType === "hero"
+                    icon.color: root.lightsOut ? root.loText : (highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor)
+                    onClicked: gridView.viewType = "hero"
+                    QQC2.ToolTip.text: i18n("Hero art view")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                }
+                QQC2.ToolButton {
+                    icon.name: "tag"
+                    flat: true
+                    highlighted: gridView.showNames
+                    icon.color: root.lightsOut ? root.loText : (highlighted ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor)
+                    onClicked: gridView.showNames = !gridView.showNames
+                    QQC2.ToolTip.text: gridView.showNames ? i18n("Hide names") : i18n("Show names")
+                    QQC2.ToolTip.visible: hovered
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                }
+                QQC2.ToolSeparator {}
                 QQC2.Button {
                     icon.name: "zoom-out"
                     flat: true
@@ -405,6 +460,8 @@ Kirigami.ApplicationWindow {
     }
 
     Component.onCompleted: {
+        root.width = windowSettings.savedWidth;
+        root.height = windowSettings.savedHeight;
         if (typeof launchBigPicture !== "undefined" && launchBigPicture && !root.bigPicture)
             bigPictureAction.trigger();
         if (typeof openExePath !== "undefined" && openExePath !== "")
