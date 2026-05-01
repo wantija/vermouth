@@ -246,7 +246,7 @@ Kirigami.PromptDialog {
 
             QQC2.Label {
                 Kirigami.FormData.label: ""
-                text: i18n("SteamGridDB API key is required to download game art. You can get a free key from steamgriddb.com/profile/preferences")
+                text: i18n("SteamGridDB API key is required to download game art. You can get a free key from steamgriddb.com/profile/preferences/api")
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
                 Layout.maximumWidth: Kirigami.Units.gridUnit * 26
